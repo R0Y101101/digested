@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digested - Study Hub</title>
+<style>
+  :root {
+    --primary: #6C5CE7;
+    --secondary: #00cec9;
+    --accent: #fd79a8;
+    --dark: #2d3436;
+    --light: #f0f0f7;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--light);
+    color: var(--dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .hero {
+    background: linear-gradient(135deg, var(--primary), #4834d4);
+    color: white;
+    width: 100%;
+    padding: 60px 20px;
+    text-align: center;
+  }
+  .hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -1px; }
+  .hero p { font-size: 1.1rem; opacity: 0.85; }
+  .subjects {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    max-width: 900px;
+    width: 100%;
+    padding: 40px 20px;
+  }
+  .subject-card {
+    background: white;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 4px 24px rgba(108,92,231,0.12);
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    color: var(--dark);
+    border-top: 5px solid var(--primary);
+  }
+  .subject-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(108,92,231,0.2);
+  }
+  .subject-card.stats { border-top-color: var(--secondary); }
+  .subject-card .icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .subject-card h2 { font-size: 1.4rem; margin-bottom: 8px; }
+  .subject-card p { font-size: 0.9rem; color: #636e72; line-height: 1.6; }
+  .subject-card .tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-top: 12px;
+  }
+  .tag-active { background: #e6fff7; color: #00b894; }
+  .tag-coming { background: #fff3e0; color: #e17055; }
+  .footer {
+    padding: 20px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #b2bec3;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Digested</h1>
+  <p>Interactive study tools for mastering your courses</p>
+</div>
+
+<div class="subjects">
+  <a class="subject-card" href="precalc-study-hub.html">
+    <div class="icon">📐</div>
+    <h2>Precalculus</h2>
+    <p>Chapter 10: Topics in Analytic Geometry — Parametric Equations, Polar Coordinates, and Graphs of Polar Equations. Flashcards, interactive graphing, quizzes, and walkthroughs.</p>
+    <span class="tag tag-active">Active</span>
+  </a>
+
+  <a class="subject-card stats" href="stats-study-hub.html">
+    <div class="icon">📊</div>
+    <h2>Statistics</h2>
+    <p>Coming soon — drop your stats PDF and we'll build flashcards, practice problems, distribution visualizers, and hypothesis testing walkthroughs.</p>
+    <span class="tag tag-coming">Coming Soon</span>
+  </a>
+</div>
+
+<div class="footer">
+  digested.net — built to learn
+</div>
+
+</body>
+</html>
