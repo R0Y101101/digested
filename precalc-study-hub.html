@@ -398,6 +398,80 @@
   td { font-size: 0.9rem; }
   tr:nth-child(even) { background: #f8f9fa; }
 
+  /* Auth UI */
+  .auth-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+  }
+  .auth-overlay.hidden { display: none; }
+  .auth-box {
+    background: white;
+    border-radius: var(--radius);
+    padding: 32px;
+    width: 360px;
+    max-width: 90vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .auth-box h2 {
+    color: var(--primary);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .auth-box input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  .auth-box input:focus { border-color: var(--primary); outline: none; }
+  .auth-error {
+    color: var(--danger);
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+    display: none;
+  }
+  .auth-toggle {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 0.85rem;
+    color: var(--text-light);
+  }
+  .auth-toggle a {
+    color: var(--primary);
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .user-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .user-badge .username {
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0.9;
+  }
+  .user-badge .btn-logout {
+    padding: 4px 12px;
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .user-badge .btn-logout:hover { background: rgba(255,255,255,0.3); }
+
   /* Responsive */
   @media (max-width: 768px) {
     .header { padding: 14px 16px; }
@@ -424,16 +498,39 @@
 </head>
 <body>
 
+<!-- Auth Overlay -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <h2 id="authTitle">Sign In</h2>
+    <div class="auth-error" id="authError"></div>
+    <input type="text" id="authUsername" placeholder="Username" autocomplete="username">
+    <input type="password" id="authPassword" placeholder="PIN" autocomplete="current-password">
+    <button class="btn btn-primary" style="width:100%" onclick="handleAuth()">
+      <span id="authBtnText">Sign In</span>
+    </button>
+    <div class="auth-toggle">
+      <span id="authToggleText">Don't have an account?</span>
+      <a onclick="toggleAuthMode()" id="authToggleLink">Sign Up</a>
+    </div>
+  </div>
+</div>
+
 <div class="header">
   <div>
     <h1>Precalculus Study Hub</h1>
     <div class="subtitle">Chapter 10: Topics in Analytic Geometry</div>
   </div>
-  <div>
-    <div class="progress-bar-container">
-      <div class="progress-bar-fill" id="globalProgress"></div>
+  <div style="display:flex;align-items:center;gap:20px">
+    <div class="user-badge" id="userBadge" style="display:none">
+      <span class="username" id="displayUsername"></span>
+      <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
     </div>
-    <div class="progress-label" id="globalProgressLabel">0% Mastered</div>
+    <div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="globalProgress"></div>
+      </div>
+      <div class="progress-label" id="globalProgressLabel">0% Mastered</div>
+    </div>
   </div>
 </div>
 
@@ -806,17 +903,131 @@ let filteredCards = [...flashcards];
 let quizTopic = 'all';
 let currentQuiz = [];
 let quizAnswered = false;
+let authMode = 'login';
+let currentUser = null;
 
 // Progress tracking
-let progress = JSON.parse(localStorage.getItem('precalcProgress') || '{}');
-if (!progress.flashcardsViewed) progress.flashcardsViewed = {};
-if (!progress.quizScores) progress.quizScores = { parametric:[], polar:[], graphs:[] };
-if (!progress.missedQuestions) progress.missedQuestions = [];
+let progress = { flashcardsViewed: {}, quizScores: { parametric:[], polar:[], graphs:[] }, missedQuestions: [] };
 
-function saveProgress() {
-  localStorage.setItem('precalcProgress', JSON.stringify(progress));
+// ==================== AUTH (localStorage) ====================
+function getUsers() {
+  return JSON.parse(localStorage.getItem('studyhub_users') || '{}');
+}
+
+function saveUsers(users) {
+  localStorage.setItem('studyhub_users', JSON.stringify(users));
+}
+
+// Simple hash for pin (not crypto-secure, but fine for a study app)
+function hashPin(pin) {
+  let h = 0;
+  for (let i = 0; i < pin.length; i++) {
+    h = ((h << 5) - h + pin.charCodeAt(i)) | 0;
+  }
+  return h.toString();
+}
+
+function checkAuth() {
+  const saved = localStorage.getItem('studyhub_current');
+  if (saved) {
+    currentUser = saved;
+    document.getElementById('authOverlay').classList.add('hidden');
+    document.getElementById('userBadge').style.display = 'flex';
+    document.getElementById('displayUsername').textContent = currentUser;
+    loadProgress();
+  }
+}
+
+function handleAuth() {
+  const username = document.getElementById('authUsername').value.trim();
+  const pin = document.getElementById('authPassword').value;
+  const errEl = document.getElementById('authError');
+  errEl.style.display = 'none';
+
+  if (!username || username.length < 2) {
+    errEl.textContent = 'Username must be at least 2 characters';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (!pin || pin.length < 3) {
+    errEl.textContent = 'PIN must be at least 3 characters';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const users = getUsers();
+  const hashed = hashPin(pin);
+
+  if (authMode === 'signup') {
+    if (users[username]) {
+      errEl.textContent = 'Username already taken';
+      errEl.style.display = 'block';
+      return;
+    }
+    users[username] = { pin: hashed, created: Date.now() };
+    saveUsers(users);
+  } else {
+    if (!users[username]) {
+      errEl.textContent = 'Username not found';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (users[username].pin !== hashed) {
+      errEl.textContent = 'Wrong PIN';
+      errEl.style.display = 'block';
+      return;
+    }
+  }
+
+  currentUser = username;
+  localStorage.setItem('studyhub_current', username);
+  document.getElementById('authOverlay').classList.add('hidden');
+  document.getElementById('userBadge').style.display = 'flex';
+  document.getElementById('displayUsername').textContent = currentUser;
+  loadProgress();
+}
+
+function handleLogout() {
+  currentUser = null;
+  localStorage.removeItem('studyhub_current');
+  progress = { flashcardsViewed: {}, quizScores: { parametric:[], polar:[], graphs:[] }, missedQuestions: [] };
+  document.getElementById('authOverlay').classList.remove('hidden');
+  document.getElementById('userBadge').style.display = 'none';
+  document.getElementById('authUsername').value = '';
+  document.getElementById('authPassword').value = '';
   updateGlobalProgress();
   updateMissedButton();
+}
+
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'signup' : 'login';
+  document.getElementById('authTitle').textContent = authMode === 'login' ? 'Sign In' : 'Sign Up';
+  document.getElementById('authBtnText').textContent = authMode === 'login' ? 'Sign In' : 'Sign Up';
+  document.getElementById('authToggleText').textContent = authMode === 'login' ? "Don't have an account?" : 'Already have an account?';
+  document.getElementById('authToggleLink').textContent = authMode === 'login' ? 'Sign Up' : 'Sign In';
+  document.getElementById('authError').style.display = 'none';
+}
+
+function loadProgress() {
+  const data = localStorage.getItem('studyhub_progress_' + currentUser);
+  if (data) {
+    progress = JSON.parse(data);
+    if (!progress.flashcardsViewed) progress.flashcardsViewed = {};
+    if (!progress.quizScores) progress.quizScores = { parametric:[], polar:[], graphs:[] };
+    if (!progress.missedQuestions) progress.missedQuestions = [];
+  } else {
+    progress = { flashcardsViewed: {}, quizScores: { parametric:[], polar:[], graphs:[] }, missedQuestions: [] };
+  }
+  updateGlobalProgress();
+  updateMissedButton();
+}
+
+function saveProgress() {
+  updateGlobalProgress();
+  updateMissedButton();
+  if (currentUser) {
+    localStorage.setItem('studyhub_progress_' + currentUser, JSON.stringify(progress));
+  }
 }
 
 function updateMissedButton() {
@@ -1429,9 +1640,15 @@ window.addEventListener('DOMContentLoaded', () => {
   renderFlashcard();
   updateGlobalProgress();
   updateMissedButton();
+  checkAuth();
 
   // Default walkthrough
   document.getElementById('walkthroughArea').innerHTML = '<p style="color:var(--text-light)">Select a topic above to see a step-by-step walkthrough.</p>';
+
+  // Handle Enter key for auth
+  ['authUsername','authPassword'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') handleAuth(); });
+  });
 
   // Handle Enter key for graphing
   ['paramX','paramY','paramTMin','paramTMax'].forEach(id => {
