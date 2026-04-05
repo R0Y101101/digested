@@ -619,9 +619,11 @@
         <button class="topic-btn" id="qz-topic-graphs" onclick="setQuizTopic('graphs')">10.8 Polar Graphs</button>
       </div>
       <div id="quizArea"></div>
-      <div id="quizControls" style="display:flex;gap:10px;margin-top:16px;">
+      <div id="quizControls" style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
         <button class="btn btn-primary" id="quizSubmitBtn" onclick="submitQuiz()">Check Answers</button>
         <button class="btn btn-outline" onclick="generateQuiz()">New Quiz</button>
+        <button class="btn btn-danger" id="missedBtn" onclick="reviewMissed()" style="display:none">Review Missed (<span id="missedCount">0</span>)</button>
+        <button class="btn btn-small btn-outline" id="clearMissedBtn" onclick="clearMissed()" style="display:none">Clear Missed</button>
       </div>
     </div>
   </div>
@@ -809,10 +811,26 @@ let quizAnswered = false;
 let progress = JSON.parse(localStorage.getItem('precalcProgress') || '{}');
 if (!progress.flashcardsViewed) progress.flashcardsViewed = {};
 if (!progress.quizScores) progress.quizScores = { parametric:[], polar:[], graphs:[] };
+if (!progress.missedQuestions) progress.missedQuestions = [];
 
 function saveProgress() {
   localStorage.setItem('precalcProgress', JSON.stringify(progress));
   updateGlobalProgress();
+  updateMissedButton();
+}
+
+function updateMissedButton() {
+  const btn = document.getElementById('missedBtn');
+  const clearBtn = document.getElementById('clearMissedBtn');
+  const count = progress.missedQuestions.length;
+  if (count > 0) {
+    btn.style.display = 'inline-block';
+    clearBtn.style.display = 'inline-block';
+    document.getElementById('missedCount').textContent = count;
+  } else {
+    btn.style.display = 'none';
+    clearBtn.style.display = 'none';
+  }
 }
 
 function updateGlobalProgress() {
@@ -1271,6 +1289,19 @@ function submitQuiz() {
 
   const score = currentQuiz.length > 0 ? correct / currentQuiz.length : 0;
 
+  // Save missed questions
+  currentQuiz.forEach(q => {
+    const missed = (q.userAnswer === undefined || q.userAnswer !== q.correct);
+    const qKey = q.q; // use question text as unique key
+    const alreadySaved = progress.missedQuestions.some(m => m.q === qKey);
+    if (missed && !alreadySaved) {
+      progress.missedQuestions.push(q);
+    } else if (!missed && alreadySaved) {
+      // Remove from missed if they got it right this time
+      progress.missedQuestions = progress.missedQuestions.filter(m => m.q !== qKey);
+    }
+  });
+
   // Save scores by topic
   const topics = [...new Set(currentQuiz.map(q => q.topic))];
   topics.forEach(t => {
@@ -1288,6 +1319,36 @@ function submitQuiz() {
   scoreDiv.className = 'quiz-score';
   scoreDiv.innerHTML = '<div class="score-num">' + correct + '/' + currentQuiz.length + '</div><div class="score-label">' + Math.round(score*100) + '% Correct</div>';
   document.getElementById('quizArea').prepend(scoreDiv);
+}
+
+function reviewMissed() {
+  if (progress.missedQuestions.length === 0) return;
+  quizAnswered = false;
+  document.getElementById('quizSubmitBtn').style.display = 'inline-block';
+  currentQuiz = [...progress.missedQuestions].sort(() => Math.random() - 0.5);
+
+  let html = '<div style="padding:12px 16px;background:#fff5f3;border:1px solid var(--danger);border-radius:10px;margin-bottom:16px;font-size:0.9rem;color:var(--danger);font-weight:600;">Reviewing ' + currentQuiz.length + ' missed question' + (currentQuiz.length > 1 ? 's' : '') + ' — get them right to remove them from this list</div>';
+  currentQuiz.forEach((q, idx) => {
+    const tag = {parametric:'tag-parametric',polar:'tag-polar',graphs:'tag-graphs'}[q.topic];
+    const tagText = {parametric:'10.6',polar:'10.7',graphs:'10.8'}[q.topic];
+    html += '<div class="quiz-question" id="qq-' + idx + '">';
+    html += '<h3><span class="tag ' + tag + '">' + tagText + '</span> ' + (idx+1) + '. ' + q.q + '</h3>';
+    html += '<div class="quiz-options">';
+    q.options.forEach((opt, oi) => {
+      html += '<div class="quiz-option" data-q="' + idx + '" data-o="' + oi + '" onclick="selectOption(' + idx + ',' + oi + ')">' + opt + '</div>';
+    });
+    html += '</div>';
+    html += '<div class="quiz-feedback" id="qf-' + idx + '"></div>';
+    html += '</div>';
+  });
+  document.getElementById('quizArea').innerHTML = html;
+}
+
+function clearMissed() {
+  if (confirm('Clear all ' + progress.missedQuestions.length + ' missed questions?')) {
+    progress.missedQuestions = [];
+    saveProgress();
+  }
 }
 
 // ==================== WALKTHROUGHS ====================
@@ -1367,6 +1428,7 @@ function showWalkthrough(type) {
 window.addEventListener('DOMContentLoaded', () => {
   renderFlashcard();
   updateGlobalProgress();
+  updateMissedButton();
 
   // Default walkthrough
   document.getElementById('walkthroughArea').innerHTML = '<p style="color:var(--text-light)">Select a topic above to see a step-by-step walkthrough.</p>';
