@@ -45,9 +45,17 @@
     position: sticky;
     top: 0;
     z-index: 100;
+    flex-wrap: wrap;
+    gap: 10px;
   }
   .header h1 { font-size: 1.5rem; font-weight: 700; }
   .header .subtitle { font-size: 0.85rem; opacity: 0.85; }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
   .progress-bar-container {
     background: rgba(255,255,255,0.2);
     border-radius: 12px;
@@ -63,6 +71,38 @@
     width: 0%;
   }
   .progress-label { font-size: 0.75rem; opacity: 0.85; text-align: right; margin-top: 2px; }
+
+  /* XP / Level / Streak in header */
+  .xp-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .xp-bar-mini {
+    width: 60px;
+    height: 6px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .xp-bar-mini-fill {
+    height: 100%;
+    background: var(--warning);
+    border-radius: 4px;
+    transition: width 0.4s;
+  }
+  .streak-badge {
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
 
   /* Navigation Tabs */
   .nav-tabs {
@@ -131,6 +171,8 @@
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
     border-left: 5px solid var(--primary);
+    position: relative;
+    overflow: hidden;
   }
   .dash-card:hover {
     transform: translateY(-4px);
@@ -144,6 +186,59 @@
   .dash-card .stats { display: flex; gap: 16px; margin-top: 12px; }
   .dash-card .stat { font-size: 0.75rem; color: var(--text-light); }
   .dash-card .stat strong { color: var(--text); }
+  .dash-card .strength-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+  }
+
+  /* Stats row on dashboard */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .stat-card .stat-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .stat-card .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+  .stat-card .stat-sub {
+    font-size: 0.7rem;
+    color: var(--text-light);
+    margin-top: 2px;
+  }
+  .daily-goal-bar {
+    width: 100%;
+    height: 8px;
+    background: #eee;
+    border-radius: 6px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  .daily-goal-fill {
+    height: 100%;
+    background: var(--success);
+    border-radius: 6px;
+    transition: width 0.4s;
+  }
 
   /* Flashcard */
   .flashcard-container { perspective: 1000px; margin: 20px auto; max-width: 600px; }
@@ -184,10 +279,32 @@
   .flashcard-controls {
     display: flex;
     justify-content: center;
-    gap: 12px;
+    gap: 8px;
     margin-top: 16px;
+    flex-wrap: wrap;
   }
   .flashcard-nav { font-size: 0.9rem; color: var(--text-light); text-align: center; margin-bottom: 8px; }
+  .confidence-label {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-top: 8px;
+  }
+  .sr-btn {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: white;
+  }
+  .sr-btn.sr-again { background: var(--danger); }
+  .sr-btn.sr-hard { background: var(--warning); color: var(--dark); }
+  .sr-btn.sr-good { background: var(--success); }
+  .sr-btn.sr-easy { background: var(--primary); }
+  .sr-btn:hover { opacity: 0.85; transform: scale(1.05); }
 
   /* Buttons */
   .btn {
@@ -323,6 +440,174 @@
     font-size: 1rem;
     margin-top: 8px;
   }
+  .quiz-input:focus { border-color: var(--primary); outline: none; }
+  .quiz-input.correct { border-color: var(--success); background: #e6fff7; }
+  .quiz-input.incorrect { border-color: var(--danger); background: #fff5f3; }
+
+  /* Explain Why */
+  .explain-why-box {
+    margin-top: 12px;
+    padding: 16px;
+    background: #f0eeff;
+    border: 2px solid var(--primary-light);
+    border-radius: 10px;
+    display: none;
+  }
+  .explain-why-box.show { display: block; }
+  .explain-why-box label { font-size: 0.9rem; font-weight: 600; color: var(--primary); display: block; margin-bottom: 8px; }
+  .explain-why-box textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    resize: vertical;
+    min-height: 60px;
+  }
+  .explain-why-box .reveal-btn { margin-top: 8px; }
+
+  /* Timed Quiz */
+  .timer-display {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 16px;
+    font-variant-numeric: tabular-nums;
+  }
+  .timer-display.urgent { color: var(--danger); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{ opacity:1 } 50%{ opacity:0.5 } }
+  .timed-setup { text-align: center; padding: 40px 20px; }
+  .timed-setup h3 { margin-bottom: 20px; font-size: 1.2rem; }
+  .timed-options { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+  .timed-opt {
+    padding: 12px 24px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .timed-opt:hover, .timed-opt.selected { border-color: var(--primary); background: #f0eeff; }
+  .timed-progress-text { font-size: 0.85rem; color: var(--text-light); margin-bottom: 8px; text-align: center; }
+
+  /* Converter */
+  .converter-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+  }
+  .converter-canvas-wrap {
+    background: white;
+    border-radius: var(--radius);
+    padding: 8px;
+    box-shadow: var(--shadow);
+  }
+  .converter-canvas-wrap canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+    cursor: crosshair;
+  }
+  .converter-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .coord-display {
+    background: var(--light);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .coord-display h3 { font-size: 1rem; margin-bottom: 10px; }
+  .coord-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary);
+    font-family: 'Courier New', monospace;
+    margin-bottom: 4px;
+  }
+  .coord-detail { font-size: 0.8rem; color: var(--text-light); }
+
+  /* Parent View */
+  .parent-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+  }
+  .parent-overlay.hidden { display: none; }
+  .parent-pin-box {
+    background: white;
+    border-radius: var(--radius);
+    padding: 32px;
+    width: 320px;
+    max-width: 90vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    text-align: center;
+  }
+  .parent-pin-box h2 { color: var(--primary); margin-bottom: 16px; }
+  .parent-pin-box input { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; text-align: center; margin-bottom: 12px; }
+  .parent-pin-box input:focus { border-color: var(--primary); outline: none; }
+  .user-stat-card {
+    background: var(--light);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .user-stat-card h3 { color: var(--primary); margin-bottom: 12px; }
+  .user-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  .user-stat-item {
+    text-align: center;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+  }
+  .user-stat-item .val { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+  .user-stat-item .lbl { font-size: 0.7rem; color: var(--text-light); text-transform: uppercase; }
+  .topic-accuracy-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+  }
+  .topic-accuracy-bar .bar-track {
+    flex: 1;
+    height: 8px;
+    background: #eee;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .topic-accuracy-bar .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.4s;
+  }
+  .study-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    margin-top: 10px;
+  }
+  .cal-day {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 3px;
+    background: #eee;
+  }
+  .cal-day.active { background: var(--success); }
+  .cal-day.today { outline: 2px solid var(--primary); }
 
   /* Walkthrough */
   .walkthrough-step {
@@ -383,21 +668,6 @@
   .topic-btn.active { border-color: var(--primary); background: var(--primary); color: white; }
   .topic-btn:hover { border-color: var(--primary); }
 
-  /* Tables */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 12px 0;
-  }
-  th, td {
-    padding: 10px 14px;
-    text-align: center;
-    border: 1px solid #e0e0e0;
-  }
-  th { background: var(--primary); color: white; font-size: 0.85rem; }
-  td { font-size: 0.9rem; }
-  tr:nth-child(even) { background: #f8f9fa; }
-
   /* Auth UI */
   .auth-overlay {
     position: fixed;
@@ -417,11 +687,7 @@
     max-width: 90vw;
     box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   }
-  .auth-box h2 {
-    color: var(--primary);
-    margin-bottom: 20px;
-    text-align: center;
-  }
+  .auth-box h2 { color: var(--primary); margin-bottom: 20px; text-align: center; }
   .auth-box input {
     width: 100%;
     padding: 10px 14px;
@@ -432,34 +698,11 @@
     transition: border-color 0.2s;
   }
   .auth-box input:focus { border-color: var(--primary); outline: none; }
-  .auth-error {
-    color: var(--danger);
-    font-size: 0.85rem;
-    margin-bottom: 10px;
-    display: none;
-  }
-  .auth-toggle {
-    text-align: center;
-    margin-top: 14px;
-    font-size: 0.85rem;
-    color: var(--text-light);
-  }
-  .auth-toggle a {
-    color: var(--primary);
-    cursor: pointer;
-    font-weight: 600;
-    text-decoration: none;
-  }
-  .user-badge {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .user-badge .username {
-    font-size: 0.85rem;
-    font-weight: 600;
-    opacity: 0.9;
-  }
+  .auth-error { color: var(--danger); font-size: 0.85rem; margin-bottom: 10px; display: none; }
+  .auth-toggle { text-align: center; margin-top: 14px; font-size: 0.85rem; color: var(--text-light); }
+  .auth-toggle a { color: var(--primary); cursor: pointer; font-weight: 600; text-decoration: none; }
+  .user-badge { display: flex; align-items: center; gap: 10px; }
+  .user-badge .username { font-size: 0.85rem; font-weight: 600; opacity: 0.9; }
   .user-badge .btn-logout {
     padding: 4px 12px;
     border: 1px solid rgba(255,255,255,0.4);
@@ -472,6 +715,13 @@
   }
   .user-badge .btn-logout:hover { background: rgba(255,255,255,0.3); }
 
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+  th, td { padding: 10px 14px; text-align: center; border: 1px solid #e0e0e0; }
+  th { background: var(--primary); color: white; font-size: 0.85rem; }
+  td { font-size: 0.9rem; }
+  tr:nth-child(even) { background: #f8f9fa; }
+
   /* Responsive */
   @media (max-width: 768px) {
     .header { padding: 14px 16px; }
@@ -479,6 +729,8 @@
     .main { padding: 16px 10px; }
     .graph-controls { flex: 1 1 100%; }
     .nav-tab { padding: 10px 14px; font-size: 0.8rem; }
+    .converter-grid { grid-template-columns: 1fr; }
+    .xp-badge, .streak-badge { padding: 4px 8px; font-size: 0.7rem; }
   }
 
   .hint-text { font-size: 0.8rem; color: var(--text-light); font-style: italic; margin-top: 4px; }
@@ -515,12 +767,32 @@
   </div>
 </div>
 
+<!-- Parent PIN Overlay -->
+<div class="parent-overlay hidden" id="parentOverlay">
+  <div class="parent-pin-box">
+    <h2 id="parentPinTitle">Parent PIN</h2>
+    <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:16px" id="parentPinDesc">Enter your parent PIN to view stats.</p>
+    <div class="auth-error" id="parentPinError"></div>
+    <input type="password" id="parentPinInput" placeholder="Enter PIN">
+    <button class="btn btn-primary" style="width:100%" onclick="handleParentPin()">Access</button>
+    <button class="btn btn-outline" style="width:100%;margin-top:8px" onclick="document.getElementById('parentOverlay').classList.add('hidden')">Cancel</button>
+  </div>
+</div>
+
 <div class="header">
   <div>
     <h1>Precalculus Study Hub</h1>
     <div class="subtitle">Chapter 10: Topics in Analytic Geometry</div>
   </div>
-  <div style="display:flex;align-items:center;gap:20px">
+  <div class="header-right">
+    <div class="xp-badge" id="xpBadge" style="display:none">
+      <span id="levelText">Lv 1</span>
+      <div class="xp-bar-mini"><div class="xp-bar-mini-fill" id="xpBarFill"></div></div>
+      <span id="xpText">0 XP</span>
+    </div>
+    <div class="streak-badge" id="streakBadge" style="display:none">
+      <span id="streakText">0-day streak</span>
+    </div>
     <div class="user-badge" id="userBadge" style="display:none">
       <span class="username" id="displayUsername"></span>
       <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
@@ -537,17 +809,41 @@
 <div class="nav-tabs">
   <button class="nav-tab active" onclick="showSection('dashboard')">Dashboard</button>
   <button class="nav-tab" onclick="showSection('flashcards')">Flashcards</button>
-  <button class="nav-tab" onclick="showSection('parametric-graph')">Parametric Grapher</button>
-  <button class="nav-tab" onclick="showSection('polar-graph')">Polar Grapher</button>
+  <button class="nav-tab" onclick="showSection('parametric-graph')">Parametric</button>
+  <button class="nav-tab" onclick="showSection('polar-graph')">Polar</button>
   <button class="nav-tab" onclick="showSection('quiz')">Quiz</button>
+  <button class="nav-tab" onclick="showSection('timed')">Timed</button>
+  <button class="nav-tab" onclick="showSection('converter')">Converter</button>
   <button class="nav-tab" onclick="showSection('walkthroughs')">Walkthroughs</button>
   <button class="nav-tab" onclick="showSection('reference')">Reference</button>
+  <button class="nav-tab" onclick="openParentView()">Parent</button>
 </div>
 
 <div class="main">
 
   <!-- ===== DASHBOARD ===== -->
   <div class="section active" id="sec-dashboard">
+    <div class="stats-row" id="dashStatsRow">
+      <div class="stat-card">
+        <div class="stat-value" id="dashLevel">1</div>
+        <div class="stat-label">Level</div>
+        <div class="stat-sub" id="dashLevelName">Beginner</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="dashXP">0</div>
+        <div class="stat-label">Total XP</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="dashStreak">0</div>
+        <div class="stat-label">Day Streak</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="dashDailyGoal">0/10</div>
+        <div class="stat-label">Daily Goal</div>
+        <div class="daily-goal-bar"><div class="daily-goal-fill" id="dashDailyFill"></div></div>
+      </div>
+    </div>
+
     <div class="dash-grid">
       <div class="dash-card" onclick="showSection('flashcards'); setFlashcardTopic('parametric')">
         <div class="chapter-num">Section 10.6</div>
@@ -557,6 +853,7 @@
           <div class="stat">Cards: <strong>10</strong></div>
           <div class="stat" id="stat-parametric-quiz">Quiz: <strong>--</strong></div>
         </div>
+        <div class="strength-bar" id="strength-parametric"></div>
       </div>
       <div class="dash-card sec-polar" onclick="showSection('flashcards'); setFlashcardTopic('polar')">
         <div class="chapter-num">Section 10.7</div>
@@ -566,15 +863,17 @@
           <div class="stat">Cards: <strong>10</strong></div>
           <div class="stat" id="stat-polar-quiz">Quiz: <strong>--</strong></div>
         </div>
+        <div class="strength-bar" id="strength-polar"></div>
       </div>
       <div class="dash-card sec-graphs" onclick="showSection('flashcards'); setFlashcardTopic('graphs')">
         <div class="chapter-num">Section 10.8</div>
         <div class="chapter-title">Graphs of Polar Equations</div>
-        <div class="chapter-desc">Symmetry, rose curves, limaçons, lemniscates, cardioids</div>
+        <div class="chapter-desc">Symmetry, rose curves, limacons, lemniscates, cardioids</div>
         <div class="stats">
           <div class="stat">Cards: <strong>8</strong></div>
           <div class="stat" id="stat-graphs-quiz">Quiz: <strong>--</strong></div>
         </div>
+        <div class="strength-bar" id="strength-graphs"></div>
       </div>
     </div>
 
@@ -584,8 +883,8 @@
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="showSection('flashcards')">Review Flashcards</button>
         <button class="btn btn-secondary" onclick="showSection('quiz')">Take a Quiz</button>
-        <button class="btn btn-accent" onclick="showSection('parametric-graph')">Explore Graphs</button>
-        <button class="btn btn-outline" onclick="showSection('walkthroughs')">Step-by-Step</button>
+        <button class="btn btn-accent" onclick="showSection('timed')">Timed Practice</button>
+        <button class="btn btn-outline" onclick="showSection('converter')">Coordinate Converter</button>
       </div>
     </div>
   </div>
@@ -593,7 +892,7 @@
   <!-- ===== FLASHCARDS ===== -->
   <div class="section" id="sec-flashcards">
     <div class="card">
-      <h2>Flashcards</h2>
+      <h2>Flashcards <span style="font-size:0.8rem;font-weight:400;color:var(--text-light)">(Spaced Repetition)</span></h2>
       <div class="topic-selector">
         <button class="topic-btn active" id="fc-topic-all" onclick="setFlashcardTopic('all')">All Topics</button>
         <button class="topic-btn" id="fc-topic-parametric" onclick="setFlashcardTopic('parametric')">10.6 Parametric</button>
@@ -612,11 +911,14 @@
           </div>
         </div>
       </div>
-      <p class="hint-text" style="text-align:center">Click the card to flip it</p>
-      <div class="flashcard-controls">
-        <button class="btn btn-outline" onclick="prevCard()">Previous</button>
-        <button class="btn btn-primary" onclick="nextCard()">Next</button>
+      <p class="hint-text" style="text-align:center">Click the card to flip it, then rate how well you knew it</p>
+      <div class="flashcard-controls" id="fcControls">
+        <button class="sr-btn sr-again" onclick="rateCard(0)">Again</button>
+        <button class="sr-btn sr-hard" onclick="rateCard(1)">Hard</button>
+        <button class="sr-btn sr-good" onclick="rateCard(2)">Good</button>
+        <button class="sr-btn sr-easy" onclick="rateCard(3)">Easy</button>
       </div>
+      <div class="confidence-label" id="confidenceLabel"></div>
     </div>
   </div>
 
@@ -629,22 +931,10 @@
           <canvas id="parametricCanvas" class="graph-canvas" width="560" height="560"></canvas>
         </div>
         <div class="graph-controls">
-          <div class="control-group">
-            <label>x(t) =</label>
-            <input type="text" id="paramX" value="3*cos(t)" placeholder="e.g. 3*cos(t)">
-          </div>
-          <div class="control-group">
-            <label>y(t) =</label>
-            <input type="text" id="paramY" value="4*sin(t)" placeholder="e.g. 4*sin(t)">
-          </div>
-          <div class="control-group">
-            <label>t min</label>
-            <input type="number" id="paramTMin" value="0" step="0.1">
-          </div>
-          <div class="control-group">
-            <label>t max</label>
-            <input type="number" id="paramTMax" value="6.2832" step="0.1">
-          </div>
+          <div class="control-group"><label>x(t) =</label><input type="text" id="paramX" value="3*cos(t)" placeholder="e.g. 3*cos(t)"></div>
+          <div class="control-group"><label>y(t) =</label><input type="text" id="paramY" value="4*sin(t)" placeholder="e.g. 4*sin(t)"></div>
+          <div class="control-group"><label>t min</label><input type="number" id="paramTMin" value="0" step="0.1"></div>
+          <div class="control-group"><label>t max</label><input type="number" id="paramTMax" value="6.2832" step="0.1"></div>
           <button class="btn btn-primary" onclick="drawParametric()" style="width:100%">Plot Curve</button>
           <div class="control-group">
             <label>Presets</label>
@@ -673,27 +963,18 @@
           <canvas id="polarCanvas" class="graph-canvas" width="560" height="560"></canvas>
         </div>
         <div class="graph-controls">
-          <div class="control-group">
-            <label>r(θ) =</label>
-            <input type="text" id="polarEq" value="3 + 2*cos(t)" placeholder="e.g. 3 + 2*cos(t)">
-          </div>
-          <div class="control-group">
-            <label>θ min</label>
-            <input type="number" id="polarTMin" value="0" step="0.1">
-          </div>
-          <div class="control-group">
-            <label>θ max</label>
-            <input type="number" id="polarTMax" value="6.2832" step="0.1">
-          </div>
+          <div class="control-group"><label>r(t) =</label><input type="text" id="polarEq" value="3 + 2*cos(t)" placeholder="e.g. 3 + 2*cos(t)"></div>
+          <div class="control-group"><label>t min</label><input type="number" id="polarTMin" value="0" step="0.1"></div>
+          <div class="control-group"><label>t max</label><input type="number" id="polarTMax" value="6.2832" step="0.1"></div>
           <button class="btn btn-secondary" onclick="drawPolar()" style="width:100%">Plot Curve</button>
           <div class="control-group">
             <label>Presets</label>
             <div class="preset-btns">
               <button class="preset-btn" onclick="setPolarPreset('cardioid')">Cardioid</button>
-              <button class="preset-btn" onclick="setPolarPreset('limacon')">Limaçon</button>
-              <button class="preset-btn" onclick="setPolarPreset('limacon-inner')">Limaçon (inner loop)</button>
-              <button class="preset-btn" onclick="setPolarPreset('rose3')">Rose (3 petals)</button>
-              <button class="preset-btn" onclick="setPolarPreset('rose4')">Rose (4 petals)</button>
+              <button class="preset-btn" onclick="setPolarPreset('limacon')">Limacon</button>
+              <button class="preset-btn" onclick="setPolarPreset('limacon-inner')">Limacon (inner)</button>
+              <button class="preset-btn" onclick="setPolarPreset('rose3')">Rose (3)</button>
+              <button class="preset-btn" onclick="setPolarPreset('rose4')">Rose (4)</button>
               <button class="preset-btn" onclick="setPolarPreset('lemniscate')">Lemniscate</button>
               <button class="preset-btn" onclick="setPolarPreset('circle')">Circle</button>
               <button class="preset-btn" onclick="setPolarPreset('spiral')">Spiral</button>
@@ -725,16 +1006,91 @@
     </div>
   </div>
 
+  <!-- ===== TIMED QUIZ ===== -->
+  <div class="section" id="sec-timed">
+    <div class="card">
+      <h2>Timed Practice</h2>
+      <div id="timedSetup" class="timed-setup">
+        <h3>Choose your settings</h3>
+        <p style="color:var(--text-light);margin-bottom:16px">Test yourself under pressure. Answer as many as you can before time runs out.</p>
+        <label style="font-weight:600;font-size:0.9rem">Time Limit</label>
+        <div class="timed-options" style="margin-bottom:16px">
+          <div class="timed-opt" onclick="selectTimedOption(this, 'timedTime', 120)">2 min</div>
+          <div class="timed-opt selected" onclick="selectTimedOption(this, 'timedTime', 300)">5 min</div>
+          <div class="timed-opt" onclick="selectTimedOption(this, 'timedTime', 600)">10 min</div>
+        </div>
+        <label style="font-weight:600;font-size:0.9rem">Topic</label>
+        <div class="timed-options">
+          <div class="timed-opt selected" onclick="selectTimedOption(this, 'timedTopic', 'all')">All</div>
+          <div class="timed-opt" onclick="selectTimedOption(this, 'timedTopic', 'parametric')">Parametric</div>
+          <div class="timed-opt" onclick="selectTimedOption(this, 'timedTopic', 'polar')">Polar</div>
+          <div class="timed-opt" onclick="selectTimedOption(this, 'timedTopic', 'graphs')">Graphs</div>
+        </div>
+        <button class="btn btn-accent" style="margin-top:24px;padding:14px 48px;font-size:1.1rem" onclick="startTimedQuiz()">Start</button>
+      </div>
+      <div id="timedActive" style="display:none">
+        <div class="timer-display" id="timerDisplay">5:00</div>
+        <div class="timed-progress-text" id="timedProgressText">Question 1</div>
+        <div id="timedQuestion"></div>
+        <div style="display:flex;gap:10px;margin-top:16px">
+          <button class="btn btn-primary" id="timedNextBtn" onclick="timedNext()">Next</button>
+          <button class="btn btn-outline" onclick="endTimedQuiz()">End Early</button>
+        </div>
+      </div>
+      <div id="timedResults" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- ===== CONVERTER ===== -->
+  <div class="section" id="sec-converter">
+    <div class="card">
+      <h2>Interactive Coordinate Converter</h2>
+      <p style="color:var(--text-light);margin-bottom:16px">Click on the grid to place a point and see both polar and rectangular coordinates.</p>
+      <div class="converter-grid">
+        <div class="converter-canvas-wrap">
+          <canvas id="converterCanvas" width="500" height="500"></canvas>
+        </div>
+        <div class="converter-panel">
+          <div class="coord-display">
+            <h3>Rectangular</h3>
+            <div class="coord-value" id="convRectCoord">(0.00, 0.00)</div>
+            <div class="coord-detail">x = r cos &theta; , y = r sin &theta;</div>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <div class="control-group" style="flex:1"><label>x</label><input type="number" id="convX" value="0" step="0.5" onchange="convFromRect()"></div>
+              <div class="control-group" style="flex:1"><label>y</label><input type="number" id="convY" value="0" step="0.5" onchange="convFromRect()"></div>
+            </div>
+          </div>
+          <div class="coord-display">
+            <h3>Polar</h3>
+            <div class="coord-value" id="convPolarCoord">(0.00, 0.00)</div>
+            <div class="coord-detail" id="convPolarDetail">r = 0, &theta; = 0 rad = 0 deg</div>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <div class="control-group" style="flex:1"><label>r</label><input type="number" id="convR" value="0" step="0.5" min="0" onchange="convFromPolar()"></div>
+              <div class="control-group" style="flex:1"><label>&theta; (rad)</label><input type="number" id="convTheta" value="0" step="0.1" onchange="convFromPolar()"></div>
+            </div>
+          </div>
+          <div style="font-size:0.8rem;color:var(--text-light);padding:8px;background:var(--light);border-radius:8px">
+            <strong>Common angles:</strong><br>
+            &pi;/6 = 0.524, &pi;/4 = 0.785, &pi;/3 = 1.047, &pi;/2 = 1.571, &pi; = 3.14
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== WALKTHROUGHS ===== -->
   <div class="section" id="sec-walkthroughs">
     <div class="card">
       <h2>Step-by-Step Walkthroughs</h2>
       <div class="topic-selector">
         <button class="topic-btn active" onclick="showWalkthrough('elim-param')">Eliminate Parameter</button>
-        <button class="topic-btn" onclick="showWalkthrough('polar-to-rect')">Polar → Rectangular</button>
-        <button class="topic-btn" onclick="showWalkthrough('rect-to-polar')">Rectangular → Polar</button>
-        <button class="topic-btn" onclick="showWalkthrough('find-param')">Find Parametric Eqs</button>
-        <button class="topic-btn" onclick="showWalkthrough('identify-curve')">Identify Polar Curve</button>
+        <button class="topic-btn" onclick="showWalkthrough('polar-to-rect')">Polar to Rect</button>
+        <button class="topic-btn" onclick="showWalkthrough('rect-to-polar')">Rect to Polar</button>
+        <button class="topic-btn" onclick="showWalkthrough('find-param')">Find Parametric</button>
+        <button class="topic-btn" onclick="showWalkthrough('identify-curve')">Identify Curve</button>
+      </div>
+      <div style="margin-bottom:16px">
+        <button class="btn btn-secondary btn-small" onclick="generateRandomProblem()">Generate Random Problem</button>
       </div>
       <div id="walkthroughArea"></div>
     </div>
@@ -746,79 +1102,60 @@
       <h2>Quick Reference: Section 10.6 - Parametric Equations</h2>
       <h3>Plane Curve Definition</h3>
       <p>If <em>f</em> and <em>g</em> are continuous functions of <em>t</em> on an interval <em>I</em>, then the set of ordered pairs (f(t), g(t)) is a <strong>plane curve C</strong>. The equations <em>x = f(t)</em> and <em>y = g(t)</em> are <strong>parametric equations</strong> for C, and <em>t</em> is the <strong>parameter</strong>.</p>
-
       <h3 style="margin-top:16px">Eliminating the Parameter</h3>
-      <p>Solve for <em>t</em> in one equation, then substitute into the other to get a rectangular equation in <em>x</em> and <em>y</em>. For trig parametric equations, use identities like sin²θ + cos²θ = 1.</p>
-
+      <p>Solve for <em>t</em> in one equation, then substitute into the other to get a rectangular equation in <em>x</em> and <em>y</em>. For trig parametric equations, use identities like sin^2 + cos^2 = 1.</p>
       <div class="formula-grid">
-        <div class="formula-item">
-          <div class="label">Projectile Motion</div>
-          x = (v₀ cos θ)t<br>y = h + (v₀ sin θ)t − 16t²
-        </div>
-        <div class="formula-item">
-          <div class="label">Cycloid</div>
-          x = a(θ − sin θ)<br>y = a(1 − cos θ)
-        </div>
-        <div class="formula-item">
-          <div class="label">Ellipse</div>
-          x = h + a cos θ<br>y = k + b sin θ
-        </div>
-        <div class="formula-item">
-          <div class="label">Circle</div>
-          x = h + r cos θ<br>y = k + r sin θ
-        </div>
+        <div class="formula-item"><div class="label">Projectile Motion</div>x = (v0 cos a)t<br>y = h + (v0 sin a)t - 16t^2</div>
+        <div class="formula-item"><div class="label">Cycloid</div>x = a(t - sin t)<br>y = a(1 - cos t)</div>
+        <div class="formula-item"><div class="label">Ellipse</div>x = h + a cos t<br>y = k + b sin t</div>
+        <div class="formula-item"><div class="label">Circle</div>x = h + r cos t<br>y = k + r sin t</div>
       </div>
     </div>
-
     <div class="card">
       <h2>Quick Reference: Section 10.7 - Polar Coordinates</h2>
       <h3>Coordinate Conversion</h3>
       <div class="formula-grid">
-        <div class="formula-item">
-          <div class="label">Polar → Rectangular</div>
-          x = r cos θ<br>y = r sin θ
-        </div>
-        <div class="formula-item">
-          <div class="label">Rectangular → Polar</div>
-          r² = x² + y²<br>tan θ = y/x
-        </div>
+        <div class="formula-item"><div class="label">Polar to Rectangular</div>x = r cos &theta;<br>y = r sin &theta;</div>
+        <div class="formula-item"><div class="label">Rectangular to Polar</div>r^2 = x^2 + y^2<br>tan &theta; = y/x</div>
       </div>
       <h3 style="margin-top:16px">Multiple Representations</h3>
-      <p>(r, θ) = (r, θ ± 2nπ) = (−r, θ ± (2n+1)π) for any integer n. The pole is (0, θ) for any θ.</p>
-
+      <p>(r, &theta;) = (r, &theta; +/- 2n&pi;) = (-r, &theta; +/- (2n+1)&pi;) for any integer n.</p>
       <h3 style="margin-top:16px">Common Equation Conversions</h3>
       <table>
         <tr><th>Rectangular</th><th>Polar</th></tr>
-        <tr><td>x² + y² = a²</td><td>r = a</td></tr>
-        <tr><td>y = x</td><td>θ = π/4</td></tr>
-        <tr><td>x = a</td><td>r cos θ = a → r = a sec θ</td></tr>
-        <tr><td>y = a</td><td>r sin θ = a → r = a csc θ</td></tr>
-        <tr><td>y = x²</td><td>r = sec θ tan θ</td></tr>
+        <tr><td>x^2 + y^2 = a^2</td><td>r = a</td></tr>
+        <tr><td>y = x</td><td>&theta; = &pi;/4</td></tr>
+        <tr><td>x = a</td><td>r = a sec &theta;</td></tr>
+        <tr><td>y = a</td><td>r = a csc &theta;</td></tr>
       </table>
     </div>
-
     <div class="card">
       <h2>Quick Reference: Section 10.8 - Graphs of Polar Equations</h2>
       <h3>Symmetry Tests</h3>
       <table>
-        <tr><th>Symmetry</th><th>Test (replace)</th></tr>
-        <tr><td>Line θ = π/2</td><td>(r, θ) → (r, π − θ) or (−r, −θ)</td></tr>
-        <tr><td>Polar axis</td><td>(r, θ) → (r, −θ) or (−r, π − θ)</td></tr>
-        <tr><td>Pole (origin)</td><td>(r, θ) → (r, π + θ) or (−r, θ)</td></tr>
+        <tr><th>Symmetry</th><th>Test</th></tr>
+        <tr><td>Line &theta; = &pi;/2</td><td>(r,&theta;) to (r, &pi;-&theta;) or (-r,-&theta;)</td></tr>
+        <tr><td>Polar axis</td><td>(r,&theta;) to (r,-&theta;) or (-r,&pi;-&theta;)</td></tr>
+        <tr><td>Pole</td><td>(r,&theta;) to (r,&pi;+&theta;) or (-r,&theta;)</td></tr>
       </table>
-      <p style="margin-top:8px"><strong>Quick tests:</strong> r = f(sin θ) is symmetric about θ = π/2. r = g(cos θ) is symmetric about the polar axis.</p>
-
       <h3 style="margin-top:16px">Special Polar Curves</h3>
       <table>
         <tr><th>Type</th><th>Equation</th><th>Key Feature</th></tr>
-        <tr><td>Limaçon (inner loop)</td><td>r = a ± b cos/sin θ, a/b &lt; 1</td><td>Has inner loop</td></tr>
-        <tr><td>Cardioid</td><td>r = a ± b cos/sin θ, a/b = 1</td><td>Heart-shaped</td></tr>
-        <tr><td>Dimpled limaçon</td><td>r = a ± b cos/sin θ, 1 &lt; a/b &lt; 2</td><td>Dimple, no loop</td></tr>
-        <tr><td>Convex limaçon</td><td>r = a ± b cos/sin θ, a/b ≥ 2</td><td>No dimple</td></tr>
-        <tr><td>Rose curve</td><td>r = a cos nθ or a sin nθ</td><td>n petals (odd n), 2n petals (even n)</td></tr>
-        <tr><td>Lemniscate</td><td>r² = a² sin 2θ or a² cos 2θ</td><td>Figure-8 shape</td></tr>
-        <tr><td>Circle</td><td>r = a cos θ or r = a sin θ</td><td>Diameter = |a|</td></tr>
+        <tr><td>Limacon (inner loop)</td><td>r = a +/- b cos/sin, a/b &lt; 1</td><td>Has inner loop</td></tr>
+        <tr><td>Cardioid</td><td>r = a +/- b cos/sin, a/b = 1</td><td>Heart-shaped</td></tr>
+        <tr><td>Dimpled limacon</td><td>r = a +/- b cos/sin, 1 &lt; a/b &lt; 2</td><td>Dimple, no loop</td></tr>
+        <tr><td>Rose curve</td><td>r = a cos n&theta; or a sin n&theta;</td><td>n odd: n petals, n even: 2n petals</td></tr>
+        <tr><td>Lemniscate</td><td>r^2 = a^2 sin 2&theta; or cos 2&theta;</td><td>Figure-8 shape</td></tr>
       </table>
+    </div>
+  </div>
+
+  <!-- ===== PARENT VIEW ===== -->
+  <div class="section" id="sec-parent">
+    <div class="card">
+      <h2>Parent Dashboard</h2>
+      <p style="color:var(--text-light);margin-bottom:16px">Overview of all student accounts and their study progress.</p>
+      <div id="parentContent"></div>
     </div>
   </div>
 
@@ -828,72 +1165,82 @@
 // ==================== DATA ====================
 
 const flashcards = [
-  // 10.6 Parametric Equations
   { topic:'parametric', front:'What is a plane curve?', back:'If f and g are continuous functions of t on an interval I, then the set of ordered pairs (f(t), g(t)) is a plane curve C. The equations x = f(t) and y = g(t) are parametric equations, and t is the parameter.' },
   { topic:'parametric', front:'What is the orientation of a curve?', back:'The orientation is the direction in which the curve is traced out for increasing values of the parameter t. Arrows on the curve indicate this direction.' },
-  { topic:'parametric', front:'How do you eliminate the parameter?', back:'1) Solve for t in one of the parametric equations.\n2) Substitute into the other equation.\n3) Simplify to get a rectangular equation in x and y.\nFor trig functions, use identities like sin²θ + cos²θ = 1.' },
-  { topic:'parametric', front:'Parametric equations for a circle?', back:'x = h + r cos θ\ny = k + r sin θ\n\nCenter: (h, k), Radius: r\nθ ranges from 0 to 2π for a full circle.' },
-  { topic:'parametric', front:'Parametric equations for an ellipse?', back:'x = h + a cos θ\ny = k + b sin θ\n\nCenter: (h, k)\na = semi-major axis (if a > b)\nb = semi-minor axis\nEliminate θ using cos²θ + sin²θ = 1 to get:\n(x−h)²/a² + (y−k)²/b² = 1' },
-  { topic:'parametric', front:'What is a cycloid?', back:'A curve traced by a point P on a circle of radius a as the circle rolls along a straight line.\n\nx = a(θ − sin θ)\ny = a(1 − cos θ)\n\nOne arch is completed for 0 ≤ θ ≤ 2π.' },
-  { topic:'parametric', front:'Projectile motion parametric equations?', back:'x = (v₀ cos θ)t\ny = h + (v₀ sin θ)t − 16t²\n\nwhere h = initial height, v₀ = initial velocity (ft/sec), θ = launch angle, t = time.\nThe 16 comes from ½g in feet (g ≈ 32 ft/s²).' },
-  { topic:'parametric', front:'Can two different parametric equations have the same graph?', back:'Yes! Different parametrizations can produce the same graph.\nExample: x = t² − 4, y = t/2 and x = 4t² − 4, y = t both give the same parabola.\nHowever, the orientation and speed of tracing may differ.' },
-  { topic:'parametric', front:'Parametric equations for a line through (x₁,y₁) and (x₂,y₂)?', back:'x = x₁ + t(x₂ − x₁)\ny = y₁ + t(y₂ − y₁)\n\nWhen t = 0, you get (x₁, y₁).\nWhen t = 1, you get (x₂, y₂).' },
-  { topic:'parametric', front:'Parametric equations for a hyperbola?', back:'x = h + a sec θ\ny = k + b tan θ\n\nEliminate using sec²θ − tan²θ = 1 to get:\n(x−h)²/a² − (y−k)²/b² = 1' },
-
-  // 10.7 Polar Coordinates
-  { topic:'polar', front:'What are polar coordinates?', back:'A coordinate system where each point P is described by:\nr = directed distance from the pole (origin) O to P\nθ = directed angle from the polar axis (positive x-axis) to segment OP\n\nWritten as (r, θ).' },
-  { topic:'polar', front:'How do you convert from polar to rectangular?', back:'x = r cos θ\ny = r sin θ\n\nExample: (√3, π/6) → x = √3 cos(π/6) = 3/2, y = √3 sin(π/6) = √3/2' },
-  { topic:'polar', front:'How do you convert from rectangular to polar?', back:'r² = x² + y² → r = √(x² + y²)\ntan θ = y/x → θ = arctan(y/x)\n\nChoose θ in the correct quadrant!\nUse positive r when θ is in the same quadrant as (x, y).' },
-  { topic:'polar', front:'Are polar coordinates unique?', back:'No! Unlike rectangular coordinates, a point has infinitely many polar representations:\n(r, θ) = (r, θ ± 2nπ) for any integer n\n(r, θ) = (−r, θ ± (2n+1)π)\nThe pole is (0, θ) for any angle θ.' },
-  { topic:'polar', front:'What does a negative r mean?', back:'A negative r means the point is in the opposite direction. The point (−r, θ) is the same as (r, θ + π).\n\nExample: (−3, π/4) is the same as (3, 5π/4).' },
-  { topic:'polar', front:'Convert r = 2 to rectangular form', back:'r = 2\nr² = 4\nx² + y² = 4\n\nThis is a circle centered at the origin with radius 2.' },
-  { topic:'polar', front:'Convert θ = π/3 to rectangular form', back:'θ = π/3\ntan θ = tan(π/3) = √3\ny/x = √3\ny = √3 · x\n\nThis is a straight line through the origin.' },
-  { topic:'polar', front:'Convert r = sec θ to rectangular form', back:'r = sec θ = 1/cos θ\nr cos θ = 1\nx = 1\n\nThis is a vertical line at x = 1.' },
-  { topic:'polar', front:'Convert y = x² to polar form', back:'y = x²\nr sin θ = (r cos θ)²\nr sin θ = r² cos²θ\nsin θ = r cos²θ\nr = sin θ / cos²θ\nr = sec θ tan θ' },
-  { topic:'polar', front:'Convert x² + y² − 2ay = 0 to polar', back:'x² + y² − 2ay = 0\nr² − 2a(r sin θ) = 0\nr(r − 2a sin θ) = 0\nr = 2a sin θ\n\nThis is a circle of diameter 2a centered at (0, a).' },
-
-  // 10.8 Graphs of Polar Equations
-  { topic:'graphs', front:'What are the symmetry tests for polar equations?', back:'1) Symmetric about θ = π/2: Replace (r,θ) with (r, π−θ) or (−r, −θ)\n2) Symmetric about polar axis: Replace (r,θ) with (r, −θ) or (−r, π−θ)\n3) Symmetric about pole: Replace (r,θ) with (r, π+θ) or (−r, θ)\n\nQuick tests:\n• r = f(sin θ) → symmetric about θ = π/2\n• r = g(cos θ) → symmetric about polar axis' },
-  { topic:'graphs', front:'What is a limaçon?', back:'r = a ± b cos θ or r = a ± b sin θ (a > 0, b > 0)\n\nTypes based on a/b ratio:\n• a/b < 1 → Inner loop\n• a/b = 1 → Cardioid (heart-shaped)\n• 1 < a/b < 2 → Dimpled\n• a/b ≥ 2 → Convex' },
-  { topic:'graphs', front:'What is a rose curve?', back:'r = a cos(nθ) or r = a sin(nθ)\n\n• n odd → n petals\n• n even → 2n petals\n\nMaximum |r| = |a| (the petal length)\nExample: r = 3 cos 2θ has 4 petals, each of length 3.' },
-  { topic:'graphs', front:'What is a lemniscate?', back:'r² = a² sin 2θ or r² = a² cos 2θ\n\nFigure-8 (infinity) shaped curve.\n• cos 2θ version: symmetric about polar axis\n• sin 2θ version: symmetric about the pole\n\nOnly defined where sin 2θ ≥ 0 (or cos 2θ ≥ 0).' },
-  { topic:'graphs', front:'How do you sketch r = 1 − 2cos θ?', back:'1) Symmetry: Polar axis (since it\'s g(cos θ))\n2) Max |r| = 3 when θ = π\n3) r = 0 when cos θ = 1/2 → θ = π/3\n4) Plot points for θ = 0 to π, reflect across polar axis\n\nThis is a limaçon with inner loop (a/b = 1/2 < 1).\nNegative r values create the inner loop.' },
-  { topic:'graphs', front:'How many petals does r = 2 sin 3θ have?', back:'Since n = 3 (odd), the rose curve has n = 3 petals.\nEach petal has length |a| = 2.\n\nThe petals are traced for 0 ≤ θ ≤ π.\nZeros occur at θ = 0, π/3, 2π/3, π.\nMax |r| = 2 at θ = π/6, π/2, 5π/6.' },
-  { topic:'graphs', front:'What does the graph of r = a cos θ look like?', back:'It\'s a circle with:\n• Diameter = |a|\n• Center at (a/2, 0) in rectangular coords\n• Passes through the origin\n\nFor r = a sin θ:\n• Circle centered at (0, a/2)\n• Also passes through origin' },
-  { topic:'graphs', front:'What is a cardioid?', back:'A limaçon where a = b:\nr = a(1 ± cos θ) or r = a(1 ± sin θ)\n\nHeart-shaped curve that passes through the pole.\nThe "dent" points toward the direction opposite to the cos/sin term.\n\nExample: r = 2(1 + cos θ) has max r = 4 at θ = 0 and r = 0 at θ = π.' },
+  { topic:'parametric', front:'How do you eliminate the parameter?', back:'1) Solve for t in one of the parametric equations.\n2) Substitute into the other equation.\n3) Simplify to get a rectangular equation in x and y.\nFor trig functions, use identities like sin^2 + cos^2 = 1.' },
+  { topic:'parametric', front:'Parametric equations for a circle?', back:'x = h + r cos t\ny = k + r sin t\n\nCenter: (h, k), Radius: r\nt ranges from 0 to 2pi for a full circle.' },
+  { topic:'parametric', front:'Parametric equations for an ellipse?', back:'x = h + a cos t\ny = k + b sin t\n\nCenter: (h,k)\na = semi-major axis (if a > b)\nb = semi-minor axis\nEliminate t using cos^2 + sin^2 = 1 to get:\n(x-h)^2/a^2 + (y-k)^2/b^2 = 1' },
+  { topic:'parametric', front:'What is a cycloid?', back:'A curve traced by a point P on a circle of radius a as the circle rolls along a straight line.\n\nx = a(t - sin t)\ny = a(1 - cos t)\n\nOne arch is completed for 0 <= t <= 2pi.' },
+  { topic:'parametric', front:'Projectile motion parametric equations?', back:'x = (v0 cos a)t\ny = h + (v0 sin a)t - 16t^2\n\nwhere h = initial height, v0 = initial velocity (ft/sec), a = launch angle, t = time.\nThe 16 comes from 1/2 g in feet (g = 32 ft/s^2).' },
+  { topic:'parametric', front:'Can two different parametric equations have the same graph?', back:'Yes! Different parametrizations can produce the same graph.\nExample: x = t^2 - 4, y = t/2 and x = 4t^2 - 4, y = t both give the same parabola.\nHowever, the orientation and speed of tracing may differ.' },
+  { topic:'parametric', front:'Parametric equations for a line through (x1,y1) and (x2,y2)?', back:'x = x1 + t(x2 - x1)\ny = y1 + t(y2 - y1)\n\nWhen t = 0, you get (x1, y1).\nWhen t = 1, you get (x2, y2).' },
+  { topic:'parametric', front:'Parametric equations for a hyperbola?', back:'x = h + a sec t\ny = k + b tan t\n\nEliminate using sec^2 - tan^2 = 1 to get:\n(x-h)^2/a^2 - (y-k)^2/b^2 = 1' },
+  { topic:'polar', front:'What are polar coordinates?', back:'A coordinate system where each point P is described by:\nr = directed distance from the pole (origin) O to P\nt = directed angle from the polar axis (positive x-axis) to segment OP\n\nWritten as (r, t).' },
+  { topic:'polar', front:'How do you convert from polar to rectangular?', back:'x = r cos t\ny = r sin t\n\nExample: (sqrt3, pi/6) -> x = sqrt3 cos(pi/6) = 3/2, y = sqrt3 sin(pi/6) = sqrt3/2' },
+  { topic:'polar', front:'How do you convert from rectangular to polar?', back:'r^2 = x^2 + y^2 -> r = sqrt(x^2 + y^2)\ntan t = y/x -> t = arctan(y/x)\n\nChoose t in the correct quadrant!\nUse positive r when t is in the same quadrant as (x, y).' },
+  { topic:'polar', front:'Are polar coordinates unique?', back:'No! Unlike rectangular coordinates, a point has infinitely many polar representations:\n(r, t) = (r, t +/- 2n pi) for any integer n\n(r, t) = (-r, t +/- (2n+1)pi)\nThe pole is (0, t) for any angle t.' },
+  { topic:'polar', front:'What does a negative r mean?', back:'A negative r means the point is in the opposite direction. The point (-r, t) is the same as (r, t + pi).\n\nExample: (-3, pi/4) is the same as (3, 5pi/4).' },
+  { topic:'polar', front:'Convert r = 2 to rectangular form', back:'r = 2\nr^2 = 4\nx^2 + y^2 = 4\n\nThis is a circle centered at the origin with radius 2.' },
+  { topic:'polar', front:'Convert t = pi/3 to rectangular form', back:'t = pi/3\ntan t = tan(pi/3) = sqrt3\ny/x = sqrt3\ny = sqrt3 * x\n\nThis is a straight line through the origin.' },
+  { topic:'polar', front:'Convert r = sec t to rectangular form', back:'r = sec t = 1/cos t\nr cos t = 1\nx = 1\n\nThis is a vertical line at x = 1.' },
+  { topic:'polar', front:'Convert y = x^2 to polar form', back:'y = x^2\nr sin t = (r cos t)^2\nr sin t = r^2 cos^2 t\nsin t = r cos^2 t\nr = sin t / cos^2 t\nr = sec t tan t' },
+  { topic:'polar', front:'Convert x^2 + y^2 - 2ay = 0 to polar', back:'x^2 + y^2 - 2ay = 0\nr^2 - 2a(r sin t) = 0\nr(r - 2a sin t) = 0\nr = 2a sin t\n\nThis is a circle of diameter 2a centered at (0, a).' },
+  { topic:'graphs', front:'What are the symmetry tests for polar equations?', back:'1) Symmetric about t = pi/2: Replace (r,t) with (r, pi-t) or (-r, -t)\n2) Symmetric about polar axis: Replace (r,t) with (r, -t) or (-r, pi-t)\n3) Symmetric about pole: Replace (r,t) with (r, pi+t) or (-r, t)\n\nQuick tests:\n* r = f(sin t) -> symmetric about t = pi/2\n* r = g(cos t) -> symmetric about polar axis' },
+  { topic:'graphs', front:'What is a limacon?', back:'r = a +/- b cos t or r = a +/- b sin t (a > 0, b > 0)\n\nTypes based on a/b ratio:\n* a/b < 1: Inner loop\n* a/b = 1: Cardioid (heart-shaped)\n* 1 < a/b < 2: Dimpled\n* a/b >= 2: Convex' },
+  { topic:'graphs', front:'What is a rose curve?', back:'r = a cos(nt) or r = a sin(nt)\n\n* n odd: n petals\n* n even: 2n petals\n\nMaximum |r| = |a| (the petal length)\nExample: r = 3 cos 2t has 4 petals, each of length 3.' },
+  { topic:'graphs', front:'What is a lemniscate?', back:'r^2 = a^2 sin 2t or r^2 = a^2 cos 2t\n\nFigure-8 (infinity) shaped curve.\n* cos 2t version: symmetric about polar axis\n* sin 2t version: symmetric about the pole\n\nOnly defined where sin 2t >= 0 (or cos 2t >= 0).' },
+  { topic:'graphs', front:'How do you sketch r = 1 - 2cos t?', back:'1) Symmetry: Polar axis (since it is g(cos t))\n2) Max |r| = 3 when t = pi\n3) r = 0 when cos t = 1/2 -> t = pi/3\n4) Plot points for t = 0 to pi, reflect across polar axis\n\nThis is a limacon with inner loop (a/b = 1/2 < 1).\nNegative r values create the inner loop.' },
+  { topic:'graphs', front:'How many petals does r = 2 sin 3t have?', back:'Since n = 3 (odd), the rose curve has n = 3 petals.\nEach petal has length |a| = 2.\n\nThe petals are traced for 0 <= t <= pi.\nZeros occur at t = 0, pi/3, 2pi/3, pi.\nMax |r| = 2 at t = pi/6, pi/2, 5pi/6.' },
+  { topic:'graphs', front:'What does the graph of r = a cos t look like?', back:'It is a circle with:\n* Diameter = |a|\n* Center at (a/2, 0) in rectangular coords\n* Passes through the origin\n\nFor r = a sin t:\n* Circle centered at (0, a/2)\n* Also passes through origin' },
+  { topic:'graphs', front:'What is a cardioid?', back:'A limacon where a = b:\nr = a(1 +/- cos t) or r = a(1 +/- sin t)\n\nHeart-shaped curve that passes through the pole.\nThe dent points toward the direction opposite to the cos/sin term.\n\nExample: r = 2(1 + cos t) has max r = 4 at t = 0 and r = 0 at t = pi.' },
 ];
 
-// Quiz question bank
 const quizBank = [
-  // Parametric
-  { topic:'parametric', type:'mc', q:'What is the rectangular equation for x = t² − 4, y = t/2?', options:['x = 4y² − 4','x = y² − 4','y = 4x² − 4','x = 2y − 4'], correct:0, explanation:'Solve y = t/2 for t: t = 2y. Substitute: x = (2y)² − 4 = 4y² − 4.' },
-  { topic:'parametric', type:'mc', q:'What is the rectangular form of x = 3cos θ, y = 4sin θ?', options:['x²/9 + y²/16 = 1','x²/3 + y²/4 = 1','x² + y² = 25','9x² + 16y² = 1'], correct:0, explanation:'cos θ = x/3, sin θ = y/4. Using cos²θ + sin²θ = 1: x²/9 + y²/16 = 1. This is an ellipse.' },
-  { topic:'parametric', type:'mc', q:'A cycloid is traced by a point on a circle as it:', options:['Rolls along a straight line','Rotates around another circle','Spirals outward','Oscillates back and forth'], correct:0, explanation:'A cycloid is the curve traced by a point on the circumference of a circle as it rolls along a straight line without slipping.' },
-  { topic:'parametric', type:'mc', q:'What curve does x = 2cos θ, y = 2sin θ represent?', options:['Circle of radius 2','Ellipse','Parabola','Line'], correct:0, explanation:'cos²θ + sin²θ = 1 → x²/4 + y²/4 = 1 → x² + y² = 4. Circle centered at origin, radius 2.' },
-  { topic:'parametric', type:'mc', q:'For projectile motion x = (v₀cosα)t, y = h + (v₀sinα)t − 16t², what does h represent?', options:['Initial height','Maximum height','Horizontal distance','Initial velocity'], correct:0, explanation:'h is the initial height above the ground from which the projectile is launched.' },
-  { topic:'parametric', type:'mc', q:'The orientation of a parametric curve refers to:', options:['Direction traced as t increases','The curve\'s slope','Whether y is a function of x','The speed of tracing'], correct:0, explanation:'Orientation is the direction in which the curve is traced out for increasing values of t, shown by arrows.' },
-  { topic:'parametric', type:'mc', q:'What are parametric equations for the line through (0,0) and (3,6)?', options:['x = 3t, y = 6t','x = 6t, y = 3t','x = t + 3, y = t + 6','x = 3cos t, y = 6sin t'], correct:0, explanation:'Using x = x₁ + t(x₂−x₁), y = y₁ + t(y₂−y₁): x = 0 + 3t = 3t, y = 0 + 6t = 6t.' },
-  { topic:'parametric', type:'mc', q:'Eliminate the parameter from x = eᵗ, y = e²ᵗ:', options:['y = x²','y = 2x','y = ln(x²)','x = y²'], correct:0, explanation:'Since x = eᵗ, we have t = ln(x). Then y = e²ᵗ = (eᵗ)² = x². Domain: x > 0.' },
+  // MC - Parametric
+  { topic:'parametric', type:'mc', q:'What is the rectangular equation for x = t^2 - 4, y = t/2?', options:['x = 4y^2 - 4','x = y^2 - 4','y = 4x^2 - 4','x = 2y - 4'], correct:0, explanation:'Solve y = t/2 for t: t = 2y. Substitute: x = (2y)^2 - 4 = 4y^2 - 4.' },
+  { topic:'parametric', type:'mc', q:'What is the rectangular form of x = 3cos t, y = 4sin t?', options:['x^2/9 + y^2/16 = 1','x^2/3 + y^2/4 = 1','x^2 + y^2 = 25','9x^2 + 16y^2 = 1'], correct:0, explanation:'cos t = x/3, sin t = y/4. Using cos^2 + sin^2 = 1: x^2/9 + y^2/16 = 1.' },
+  { topic:'parametric', type:'mc', q:'A cycloid is traced by a point on a circle as it:', options:['Rolls along a straight line','Rotates around another circle','Spirals outward','Oscillates back and forth'], correct:0, explanation:'A cycloid is the curve traced by a point on the circumference of a circle as it rolls along a straight line.' },
+  { topic:'parametric', type:'mc', q:'What curve does x = 2cos t, y = 2sin t represent?', options:['Circle of radius 2','Ellipse','Parabola','Line'], correct:0, explanation:'cos^2 + sin^2 = 1 gives x^2/4 + y^2/4 = 1 or x^2 + y^2 = 4. Circle radius 2.' },
+  { topic:'parametric', type:'mc', q:'For projectile motion, what does h represent?', options:['Initial height','Maximum height','Horizontal distance','Initial velocity'], correct:0, explanation:'h is the initial height above the ground from which the projectile is launched.' },
+  { topic:'parametric', type:'mc', q:'The orientation of a parametric curve refers to:', options:['Direction traced as t increases','The curve slope','Whether y is a function of x','The speed of tracing'], correct:0, explanation:'Orientation is the direction in which the curve is traced for increasing values of t.' },
+  { topic:'parametric', type:'mc', q:'Parametric equations for line through (0,0) and (3,6)?', options:['x = 3t, y = 6t','x = 6t, y = 3t','x = t+3, y = t+6','x = 3cos t, y = 6sin t'], correct:0, explanation:'x = 0 + 3t = 3t, y = 0 + 6t = 6t.' },
+  { topic:'parametric', type:'mc', q:'Eliminate the parameter from x = e^t, y = e^(2t):', options:['y = x^2','y = 2x','y = ln(x^2)','x = y^2'], correct:0, explanation:'x = e^t so t = ln(x). Then y = e^(2t) = (e^t)^2 = x^2. Domain: x > 0.' },
+  // MC - Polar
+  { topic:'polar', type:'mc', q:'Convert (2, pi/3) from polar to rectangular:', options:['(1, sqrt3)','(sqrt3, 1)','(2, 2)','(0, 2)'], correct:0, explanation:'x = 2cos(pi/3) = 1, y = 2sin(pi/3) = sqrt3.' },
+  { topic:'polar', type:'mc', q:'Convert (-1, 1) from rectangular to polar:', options:['(sqrt2, 3pi/4)','(sqrt2, pi/4)','(1, 3pi/4)','(sqrt2, -pi/4)'], correct:0, explanation:'r = sqrt(1+1) = sqrt2. Point in Q2 so t = 3pi/4.' },
+  { topic:'polar', type:'mc', q:'Convert r = 4sin t to rectangular form:', options:['x^2 + (y-2)^2 = 4','x^2 + y^2 = 4','(x-2)^2 + y^2 = 4','y = 4x'], correct:0, explanation:'r = 4sin t -> r^2 = 4r sin t -> x^2+y^2 = 4y -> x^2+(y-2)^2 = 4.' },
+  { topic:'polar', type:'mc', q:'What is the polar form of x^2 + y^2 = 9?', options:['r = 3','r^2 = 9sin t','r = 9','t = 3'], correct:0, explanation:'r^2 = x^2+y^2 = 9, so r = 3.' },
+  { topic:'polar', type:'mc', q:'Convert t = pi/4 to rectangular form:', options:['y = x','y = -x','x = 1','y = 1'], correct:0, explanation:'tan(pi/4) = 1, so y/x = 1, meaning y = x.' },
+  { topic:'polar', type:'mc', q:'Convert r = -2cos t to rectangular form:', options:['(x+1)^2 + y^2 = 1','x^2 + (y+1)^2 = 1','x^2+y^2 = 2','(x-1)^2+y^2 = 1'], correct:0, explanation:'r^2 = -2r cos t -> x^2+y^2 = -2x -> (x+1)^2+y^2 = 1.' },
+  { topic:'polar', type:'mc', q:'The pole is represented by:', options:['(0, t) for any angle t','Only (0, 0)','(r, 0) for any r','Cannot be represented'], correct:0, explanation:'The pole (origin) is (0, t) for any angle t.' },
+  // MC - Graphs
+  { topic:'graphs', type:'mc', q:'What type of curve is r = 2 + 2sin t?', options:['Cardioid','Limacon with inner loop','Rose curve','Lemniscate'], correct:0, explanation:'a = b = 2, so a/b = 1. This is a cardioid.' },
+  { topic:'graphs', type:'mc', q:'How many petals does r = 3cos(4t) have?', options:['8','4','3','6'], correct:0, explanation:'n = 4 (even), so 2n = 8 petals.' },
+  { topic:'graphs', type:'mc', q:'How many petals does r = 2sin(3t) have?', options:['3','6','2','9'], correct:0, explanation:'n = 3 (odd), so n = 3 petals.' },
+  { topic:'graphs', type:'mc', q:'r = f(sin t) is symmetric with respect to:', options:['The line t = pi/2','The polar axis','The pole','None'], correct:0, explanation:'r = f(sin t) is always symmetric about t = pi/2.' },
+  { topic:'graphs', type:'mc', q:'r = g(cos t) is symmetric with respect to:', options:['The polar axis','The line t = pi/2','The pole','None'], correct:0, explanation:'r = g(cos t) is always symmetric about the polar axis.' },
+  { topic:'graphs', type:'mc', q:'What type of curve is r = 1 - 3cos t?', options:['Limacon with inner loop','Cardioid','Dimpled limacon','Rose curve'], correct:0, explanation:'|a/b| = 1/3 < 1, so it has an inner loop.' },
+  { topic:'graphs', type:'mc', q:'r^2 = 9cos(2t) represents a:', options:['Lemniscate','Rose curve','Circle','Limacon'], correct:0, explanation:'The form r^2 = a^2 cos(2t) is a lemniscate.' },
+  { topic:'graphs', type:'mc', q:'What is the maximum |r| for r = 3 + 2cos t?', options:['5','3','2','1'], correct:0, explanation:'Max when cos t = 1: r = 3 + 2 = 5.' },
 
-  // Polar Coordinates
-  { topic:'polar', type:'mc', q:'Convert (2, π/3) from polar to rectangular:', options:['(1, √3)','(√3, 1)','(2, 2)','(0, 2)'], correct:0, explanation:'x = 2cos(π/3) = 2(1/2) = 1\ny = 2sin(π/3) = 2(√3/2) = √3' },
-  { topic:'polar', type:'mc', q:'Convert (−1, 1) from rectangular to polar:', options:['(√2, 3π/4)','(√2, π/4)','(1, 3π/4)','(√2, −π/4)'], correct:0, explanation:'r = √(1+1) = √2\ntan θ = 1/(−1) = −1, point in Q2 → θ = π − π/4 = 3π/4' },
-  { topic:'polar', type:'mc', q:'Which point is the same as (3, −3π/4)?', options:['(3, 5π/4)','(3, 3π/4)','(−3, 3π/4)','Both A and C'], correct:3, explanation:'(3, −3π/4) = (3, −3π/4 + 2π) = (3, 5π/4)\nAlso = (−3, −3π/4 + π) = (−3, π/4). Wait, let me reconsider.\n(3, 5π/4) is the same. (−3, −3π/4 + π) = (−3, π/4). So A is correct for sure, and C: (−3, 3π/4) = (3, 3π/4 + π) = (3, 7π/4) ≠ (3, 5π/4). So only A.' },
-  { topic:'polar', type:'mc', q:'Convert r = 4sinθ to rectangular form:', options:['x² + (y−2)² = 4','x² + y² = 4','(x−2)² + y² = 4','y = 4x'], correct:0, explanation:'r = 4sinθ → r² = 4r sinθ → x² + y² = 4y → x² + y² − 4y = 0 → x² + (y−2)² = 4. Circle centered at (0,2), radius 2.' },
-  { topic:'polar', type:'mc', q:'What is the polar form of x² + y² = 9?', options:['r = 3','r² = 9sinθ','r = 9','θ = 3'], correct:0, explanation:'Since r² = x² + y², we get r² = 9, so r = 3. This is a circle of radius 3.' },
-  { topic:'polar', type:'mc', q:'Convert θ = π/4 to rectangular form:', options:['y = x','y = −x','x = 1','y = 1'], correct:0, explanation:'tan(π/4) = 1, and tan θ = y/x, so y/x = 1, meaning y = x.' },
-  { topic:'polar', type:'mc', q:'Convert r = −2cosθ to rectangular form:', options:['(x+1)² + y² = 1','x² + (y+1)² = 1','x² + y² = 2','(x−1)² + y² = 1'], correct:0, explanation:'r = −2cosθ → r² = −2r cosθ → x²+y² = −2x → x²+2x+y² = 0 → (x+1)²+y² = 1. Circle center (−1,0), radius 1.' },
-  { topic:'polar', type:'mc', q:'The pole in polar coordinates is represented by:', options:['(0, θ) for any angle θ','Only (0, 0)','(r, 0) for any r','It cannot be represented'], correct:0, explanation:'The pole (origin) is at distance r = 0 from itself, and any angle works, so it\'s (0, θ) for any θ.' },
+  // COMPUTATION - Parametric
+  { topic:'parametric', type:'input', q:'For x = t^2 - 4 and y = t/2, what is x when t = 3?', answer:'5', tolerance:0.01, explanation:'x = 3^2 - 4 = 9 - 4 = 5' },
+  { topic:'parametric', type:'input', q:'For x = 3cos t, y = 4sin t, what is y when t = pi/2? (exact integer)', answer:'4', tolerance:0.01, explanation:'y = 4sin(pi/2) = 4(1) = 4' },
+  { topic:'parametric', type:'input', q:'For the line x = 3t, y = 6t, what is the slope? (y/x ratio)', answer:'2', tolerance:0.01, explanation:'slope = dy/dx = 6/3 = 2, or y = 2x.' },
+  { topic:'parametric', type:'input', q:'For x = 2cos t, y = 2sin t, what is x^2 + y^2?', answer:'4', tolerance:0.01, explanation:'x^2+y^2 = 4cos^2(t)+4sin^2(t) = 4.' },
 
-  // Polar Graphs
-  { topic:'graphs', type:'mc', q:'What type of curve is r = 2 + 2sinθ?', options:['Cardioid','Limaçon with inner loop','Rose curve','Lemniscate'], correct:0, explanation:'r = a + b sinθ where a = b = 2. Since a/b = 1, this is a cardioid.' },
-  { topic:'graphs', type:'mc', q:'How many petals does r = 3cos(4θ) have?', options:['8','4','3','6'], correct:0, explanation:'For r = a cos(nθ) with n even, there are 2n petals. Here n = 4, so 2(4) = 8 petals.' },
-  { topic:'graphs', type:'mc', q:'How many petals does r = 2sin(3θ) have?', options:['3','6','2','9'], correct:0, explanation:'For r = a sin(nθ) with n odd, there are n petals. Here n = 3, so 3 petals.' },
-  { topic:'graphs', type:'mc', q:'r = f(sinθ) is symmetric with respect to:', options:['The line θ = π/2','The polar axis','The pole','None of these'], correct:0, explanation:'Quick test: r = f(sin θ) is always symmetric with respect to the vertical line θ = π/2.' },
-  { topic:'graphs', type:'mc', q:'r = g(cosθ) is symmetric with respect to:', options:['The polar axis','The line θ = π/2','The pole','None of these'], correct:0, explanation:'Quick test: r = g(cos θ) is always symmetric with respect to the polar axis (horizontal axis).' },
-  { topic:'graphs', type:'mc', q:'What type of curve is r = 1 − 3cosθ?', options:['Limaçon with inner loop','Cardioid','Dimpled limaçon','Rose curve'], correct:0, explanation:'r = a + b cosθ where a = 1, b = 3 (using r = 1 − 3cosθ = 1 + (−3)cosθ). |a/b| = 1/3 < 1, so it has an inner loop.' },
-  { topic:'graphs', type:'mc', q:'r² = 9cos(2θ) represents a:', options:['Lemniscate','Rose curve','Circle','Limaçon'], correct:0, explanation:'The form r² = a²cos(2θ) is a lemniscate (figure-8 shape). Here a² = 9, so a = 3.' },
-  { topic:'graphs', type:'mc', q:'What is the maximum |r| for r = 3 + 2cosθ?', options:['5','3','2','1'], correct:0, explanation:'Maximum |r| occurs when cosθ = 1 (θ = 0): r = 3 + 2(1) = 5.' },
+  // COMPUTATION - Polar
+  { topic:'polar', type:'input', q:'Convert (4, pi/3) to rectangular. What is x?', answer:'2', tolerance:0.05, explanation:'x = 4 cos(pi/3) = 4(1/2) = 2' },
+  { topic:'polar', type:'input', q:'Convert (4, pi/3) to rectangular. What is y? (round to 2 decimals)', answer:'3.46', tolerance:0.05, explanation:'y = 4 sin(pi/3) = 4(sqrt3/2) = 2sqrt3 = 3.46' },
+  { topic:'polar', type:'input', q:'Convert (3, 4) rectangular to polar. What is r?', answer:'5', tolerance:0.05, explanation:'r = sqrt(9 + 16) = sqrt(25) = 5' },
+  { topic:'polar', type:'input', q:'For r = 3 + 2cos(t), what is r when t = 0?', answer:'5', tolerance:0.01, explanation:'r = 3 + 2cos(0) = 3 + 2(1) = 5' },
+  { topic:'polar', type:'input', q:'For r = 3 + 2cos(t), what is r when t = pi?', answer:'1', tolerance:0.01, explanation:'r = 3 + 2cos(pi) = 3 + 2(-1) = 1' },
+
+  // COMPUTATION - Graphs
+  { topic:'graphs', type:'input', q:'How many petals does r = 4cos(5t) have?', answer:'5', tolerance:0, explanation:'n = 5 is odd, so there are n = 5 petals.' },
+  { topic:'graphs', type:'input', q:'How many petals does r = 3sin(6t) have?', answer:'12', tolerance:0, explanation:'n = 6 is even, so there are 2n = 12 petals.' },
+  { topic:'graphs', type:'input', q:'For r = 2 + 5cos(t), what is the maximum r?', answer:'7', tolerance:0.01, explanation:'Max when cos t = 1: r = 2 + 5 = 7.' },
+  { topic:'graphs', type:'input', q:'For r = 4(1 + sin t), what is r when t = pi/2?', answer:'8', tolerance:0.01, explanation:'r = 4(1 + sin(pi/2)) = 4(1+1) = 8.' },
 ];
 
 // ==================== STATE ====================
@@ -906,24 +1253,19 @@ let quizAnswered = false;
 let authMode = 'login';
 let currentUser = null;
 
-// Progress tracking
-let progress = { flashcardsViewed: {}, quizScores: { parametric:[], polar:[], graphs:[] }, missedQuestions: [] };
+let progress = { flashcardsViewed: {}, quizScores: { parametric:[], polar:[], graphs:[] }, missedQuestions: [], xp: 0, streak: 0, lastStudyDate: null, longestStreak: 0, cardConfidence: {}, totalAnswered: 0, dailyLog: {} };
+
+// Timed quiz state
+let timedConfig = { time: 300, topic: 'all' };
+let timedState = { active: false, timer: null, remaining: 0, questions: [], current: 0, correct: 0, answered: 0 };
 
 // ==================== AUTH (localStorage) ====================
-function getUsers() {
-  return JSON.parse(localStorage.getItem('studyhub_users') || '{}');
-}
+function getUsers() { return JSON.parse(localStorage.getItem('studyhub_users') || '{}'); }
+function saveUsers(u) { localStorage.setItem('studyhub_users', JSON.stringify(u)); }
 
-function saveUsers(users) {
-  localStorage.setItem('studyhub_users', JSON.stringify(users));
-}
-
-// Simple hash for pin (not crypto-secure, but fine for a study app)
 function hashPin(pin) {
   let h = 0;
-  for (let i = 0; i < pin.length; i++) {
-    h = ((h << 5) - h + pin.charCodeAt(i)) | 0;
-  }
+  for (let i = 0; i < pin.length; i++) h = ((h << 5) - h + pin.charCodeAt(i)) | 0;
   return h.toString();
 }
 
@@ -943,42 +1285,18 @@ function handleAuth() {
   const pin = document.getElementById('authPassword').value;
   const errEl = document.getElementById('authError');
   errEl.style.display = 'none';
-
-  if (!username || username.length < 2) {
-    errEl.textContent = 'Username must be at least 2 characters';
-    errEl.style.display = 'block';
-    return;
-  }
-  if (!pin || pin.length < 3) {
-    errEl.textContent = 'PIN must be at least 3 characters';
-    errEl.style.display = 'block';
-    return;
-  }
-
+  if (!username || username.length < 2) { errEl.textContent = 'Username must be at least 2 characters'; errEl.style.display = 'block'; return; }
+  if (!pin || pin.length < 3) { errEl.textContent = 'PIN must be at least 3 characters'; errEl.style.display = 'block'; return; }
   const users = getUsers();
   const hashed = hashPin(pin);
-
   if (authMode === 'signup') {
-    if (users[username]) {
-      errEl.textContent = 'Username already taken';
-      errEl.style.display = 'block';
-      return;
-    }
+    if (users[username]) { errEl.textContent = 'Username already taken'; errEl.style.display = 'block'; return; }
     users[username] = { pin: hashed, created: Date.now() };
     saveUsers(users);
   } else {
-    if (!users[username]) {
-      errEl.textContent = 'Username not found';
-      errEl.style.display = 'block';
-      return;
-    }
-    if (users[username].pin !== hashed) {
-      errEl.textContent = 'Wrong PIN';
-      errEl.style.display = 'block';
-      return;
-    }
+    if (!users[username]) { errEl.textContent = 'Username not found'; errEl.style.display = 'block'; return; }
+    if (users[username].pin !== hashed) { errEl.textContent = 'Wrong PIN'; errEl.style.display = 'block'; return; }
   }
-
   currentUser = username;
   localStorage.setItem('studyhub_current', username);
   document.getElementById('authOverlay').classList.add('hidden');
@@ -990,13 +1308,12 @@ function handleAuth() {
 function handleLogout() {
   currentUser = null;
   localStorage.removeItem('studyhub_current');
-  progress = { flashcardsViewed: {}, quizScores: { parametric:[], polar:[], graphs:[] }, missedQuestions: [] };
+  progress = { flashcardsViewed: {}, quizScores: { parametric:[], polar:[], graphs:[] }, missedQuestions: [], xp: 0, streak: 0, lastStudyDate: null, longestStreak: 0, cardConfidence: {}, totalAnswered: 0, dailyLog: {} };
   document.getElementById('authOverlay').classList.remove('hidden');
   document.getElementById('userBadge').style.display = 'none';
   document.getElementById('authUsername').value = '';
   document.getElementById('authPassword').value = '';
-  updateGlobalProgress();
-  updateMissedButton();
+  updateAllDisplays();
 }
 
 function toggleAuthMode() {
@@ -1011,57 +1328,172 @@ function toggleAuthMode() {
 function loadProgress() {
   const data = localStorage.getItem('studyhub_progress_' + currentUser);
   if (data) {
-    progress = JSON.parse(data);
-    if (!progress.flashcardsViewed) progress.flashcardsViewed = {};
+    const p = JSON.parse(data);
+    progress = Object.assign({ flashcardsViewed: {}, quizScores: { parametric:[], polar:[], graphs:[] }, missedQuestions: [], xp: 0, streak: 0, lastStudyDate: null, longestStreak: 0, cardConfidence: {}, totalAnswered: 0, dailyLog: {} }, p);
     if (!progress.quizScores) progress.quizScores = { parametric:[], polar:[], graphs:[] };
-    if (!progress.missedQuestions) progress.missedQuestions = [];
+    if (!progress.cardConfidence) progress.cardConfidence = {};
+    if (!progress.dailyLog) progress.dailyLog = {};
   } else {
-    progress = { flashcardsViewed: {}, quizScores: { parametric:[], polar:[], graphs:[] }, missedQuestions: [] };
+    progress = { flashcardsViewed: {}, quizScores: { parametric:[], polar:[], graphs:[] }, missedQuestions: [], xp: 0, streak: 0, lastStudyDate: null, longestStreak: 0, cardConfidence: {}, totalAnswered: 0, dailyLog: {} };
   }
-  updateGlobalProgress();
-  updateMissedButton();
+  updateStreak();
+  updateAllDisplays();
 }
 
 function saveProgress() {
+  if (currentUser) localStorage.setItem('studyhub_progress_' + currentUser, JSON.stringify(progress));
+  updateAllDisplays();
+}
+
+// ==================== XP / LEVEL SYSTEM ====================
+const LEVELS = [
+  { name: 'Beginner', xp: 0 },
+  { name: 'Learner', xp: 100 },
+  { name: 'Student', xp: 250 },
+  { name: 'Scholar', xp: 500 },
+  { name: 'Expert', xp: 1000 },
+  { name: 'Master', xp: 2000 },
+  { name: 'Legend', xp: 4000 },
+];
+
+function getLevel(xp) {
+  let lvl = 1;
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (xp >= LEVELS[i].xp) { lvl = i + 1; break; }
+  }
+  return lvl;
+}
+
+function getLevelName(xp) { return LEVELS[getLevel(xp) - 1].name; }
+
+function getLevelProgress(xp) {
+  const lvl = getLevel(xp);
+  const cur = LEVELS[lvl - 1].xp;
+  const next = lvl < LEVELS.length ? LEVELS[lvl].xp : LEVELS[lvl - 1].xp + 1000;
+  return (xp - cur) / (next - cur);
+}
+
+function addXP(amount) {
+  progress.xp = (progress.xp || 0) + amount;
+  saveProgress();
+}
+
+// ==================== STREAK SYSTEM ====================
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+
+function updateStreak() {
+  const today = todayStr();
+  const last = progress.lastStudyDate;
+  if (!last) {
+    progress.streak = 0;
+  } else if (last === today) {
+    // Already studied today, streak is current
+  } else {
+    const lastDate = new Date(last);
+    const todayDate = new Date(today);
+    const diff = (todayDate - lastDate) / (1000 * 60 * 60 * 24);
+    if (diff === 1) {
+      // Streak continues
+    } else if (diff > 1) {
+      progress.streak = 0;
+    }
+  }
+}
+
+function recordStudyActivity() {
+  const today = todayStr();
+  if (progress.lastStudyDate !== today) {
+    if (progress.lastStudyDate) {
+      const diff = (new Date(today) - new Date(progress.lastStudyDate)) / (1000*60*60*24);
+      if (diff === 1) {
+        progress.streak = (progress.streak || 0) + 1;
+      } else {
+        progress.streak = 1;
+      }
+    } else {
+      progress.streak = 1;
+    }
+    progress.lastStudyDate = today;
+    if (progress.streak > (progress.longestStreak || 0)) progress.longestStreak = progress.streak;
+    addXP(10); // daily login bonus
+  }
+  if (!progress.dailyLog[today]) progress.dailyLog[today] = 0;
+  progress.dailyLog[today]++;
+}
+
+// ==================== DISPLAY UPDATES ====================
+function updateAllDisplays() {
   updateGlobalProgress();
   updateMissedButton();
-  if (currentUser) {
-    localStorage.setItem('studyhub_progress_' + currentUser, JSON.stringify(progress));
-  }
+  updateXPDisplay();
+  updateStreakDisplay();
+  updateDashboard();
+  updateHeatmap();
+}
+
+function updateXPDisplay() {
+  const xp = progress.xp || 0;
+  const lvl = getLevel(xp);
+  const pct = Math.round(getLevelProgress(xp) * 100);
+  document.getElementById('xpBadge').style.display = 'flex';
+  document.getElementById('levelText').textContent = 'Lv ' + lvl;
+  document.getElementById('xpText').textContent = xp + ' XP';
+  document.getElementById('xpBarFill').style.width = pct + '%';
+  document.getElementById('dashLevel').textContent = lvl;
+  document.getElementById('dashLevelName').textContent = getLevelName(xp);
+  document.getElementById('dashXP').textContent = xp;
+}
+
+function updateStreakDisplay() {
+  const streak = progress.streak || 0;
+  document.getElementById('streakBadge').style.display = 'flex';
+  document.getElementById('streakText').textContent = streak + '-day streak';
+  document.getElementById('dashStreak').textContent = streak;
+}
+
+function updateDashboard() {
+  const today = todayStr();
+  const todayCount = (progress.dailyLog && progress.dailyLog[today]) || 0;
+  document.getElementById('dashDailyGoal').textContent = todayCount + '/10';
+  document.getElementById('dashDailyFill').style.width = Math.min(100, todayCount * 10) + '%';
+}
+
+function updateHeatmap() {
+  ['parametric', 'polar', 'graphs'].forEach(t => {
+    const scores = progress.quizScores[t] || [];
+    const el = document.getElementById('strength-' + t);
+    const statEl = document.getElementById('stat-' + t + '-quiz');
+    if (scores.length > 0) {
+      const avg = scores.reduce((a,b) => a+b, 0) / scores.length;
+      const pct = Math.round(avg * 100);
+      let color;
+      if (pct >= 70) color = 'var(--success)';
+      else if (pct >= 40) color = 'var(--warning)';
+      else color = 'var(--danger)';
+      el.style.background = color;
+      if (statEl) statEl.innerHTML = 'Quiz: <strong>' + pct + '%</strong>';
+    } else {
+      el.style.background = '#eee';
+    }
+  });
 }
 
 function updateMissedButton() {
   const btn = document.getElementById('missedBtn');
   const clearBtn = document.getElementById('clearMissedBtn');
-  const count = progress.missedQuestions.length;
-  if (count > 0) {
-    btn.style.display = 'inline-block';
-    clearBtn.style.display = 'inline-block';
-    document.getElementById('missedCount').textContent = count;
-  } else {
-    btn.style.display = 'none';
-    clearBtn.style.display = 'none';
-  }
+  const count = (progress.missedQuestions || []).length;
+  if (count > 0) { btn.style.display = 'inline-block'; clearBtn.style.display = 'inline-block'; document.getElementById('missedCount').textContent = count; }
+  else { btn.style.display = 'none'; clearBtn.style.display = 'none'; }
 }
 
 function updateGlobalProgress() {
   const totalCards = flashcards.length;
-  const viewedCards = Object.keys(progress.flashcardsViewed).length;
-  const allScores = [...progress.quizScores.parametric, ...progress.quizScores.polar, ...progress.quizScores.graphs];
+  const viewedCards = Object.keys(progress.flashcardsViewed || {}).length;
+  const allScores = [...(progress.quizScores.parametric||[]), ...(progress.quizScores.polar||[]), ...(progress.quizScores.graphs||[])];
   const avgScore = allScores.length > 0 ? allScores.reduce((a,b)=>a+b,0)/allScores.length : 0;
   const pct = Math.round((viewedCards/totalCards * 40) + (avgScore * 60));
   document.getElementById('globalProgress').style.width = pct + '%';
   document.getElementById('globalProgressLabel').textContent = pct + '% Mastered';
-
-  // Update dashboard stats
-  ['parametric','polar','graphs'].forEach(t => {
-    const scores = progress.quizScores[t];
-    const el = document.getElementById('stat-' + t + '-quiz');
-    if (el && scores.length > 0) {
-      const best = Math.round(Math.max(...scores) * 100);
-      el.innerHTML = 'Quiz: <strong>' + best + '%</strong>';
-    }
-  });
 }
 
 // ==================== NAVIGATION ====================
@@ -1069,58 +1501,92 @@ function showSection(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('sec-' + id).classList.add('active');
-  document.querySelectorAll('.nav-tab').forEach(t => {
-    if (t.textContent.toLowerCase().includes(id.split('-')[0]) ||
-        (id === 'dashboard' && t.textContent === 'Dashboard') ||
-        (id === 'flashcards' && t.textContent === 'Flashcards') ||
-        (id === 'parametric-graph' && t.textContent === 'Parametric Grapher') ||
-        (id === 'polar-graph' && t.textContent === 'Polar Grapher') ||
-        (id === 'quiz' && t.textContent === 'Quiz') ||
-        (id === 'walkthroughs' && t.textContent === 'Walkthroughs') ||
-        (id === 'reference' && t.textContent === 'Reference')) {
-      t.classList.add('active');
-    }
-  });
-  if (id === 'parametric-graph') { setTimeout(drawParametric, 100); }
-  if (id === 'polar-graph') { setTimeout(drawPolar, 100); }
-  if (id === 'quiz' && currentQuiz.length === 0) { generateQuiz(); }
+  const tabMap = { 'dashboard':'Dashboard','flashcards':'Flashcards','parametric-graph':'Parametric','polar-graph':'Polar','quiz':'Quiz','timed':'Timed','converter':'Converter','walkthroughs':'Walkthroughs','reference':'Reference','parent':'Parent' };
+  document.querySelectorAll('.nav-tab').forEach(t => { if (t.textContent === tabMap[id]) t.classList.add('active'); });
+  if (id === 'parametric-graph') setTimeout(drawParametric, 100);
+  if (id === 'polar-graph') setTimeout(drawPolar, 100);
+  if (id === 'quiz' && currentQuiz.length === 0) generateQuiz();
+  if (id === 'converter') setTimeout(drawConverter, 100);
 }
 
-// ==================== FLASHCARDS ====================
+// ==================== FLASHCARDS (Spaced Repetition) ====================
+function getCardConfidence(idx) { return (progress.cardConfidence && progress.cardConfidence[idx]) || 0; }
+
+function buildSRQueue() {
+  // Sort by confidence (ascending), with some randomization within same confidence
+  let indices = [];
+  for (let i = 0; i < filteredCards.length; i++) {
+    const globalIdx = flashcards.indexOf(filteredCards[i]);
+    indices.push({ local: i, global: globalIdx, conf: getCardConfidence(globalIdx) });
+  }
+  indices.sort((a, b) => {
+    if (a.conf !== b.conf) return a.conf - b.conf;
+    return Math.random() - 0.5;
+  });
+  return indices;
+}
+
+let srQueue = [];
+
 function setFlashcardTopic(topic) {
   flashcardTopic = topic;
   document.querySelectorAll('[id^="fc-topic-"]').forEach(b => b.classList.remove('active'));
   document.getElementById('fc-topic-' + topic).classList.add('active');
   filteredCards = topic === 'all' ? [...flashcards] : flashcards.filter(c => c.topic === topic);
+  srQueue = buildSRQueue();
   currentFlashcard = 0;
   renderFlashcard();
 }
 
 function renderFlashcard() {
   if (filteredCards.length === 0) return;
-  const card = filteredCards[currentFlashcard];
+  if (srQueue.length === 0) srQueue = buildSRQueue();
+  const entry = srQueue[currentFlashcard % srQueue.length];
+  const card = filteredCards[entry.local];
+  const conf = getCardConfidence(entry.global);
+  const confLabels = ['New', 'Learning', 'Reviewing', 'Mastered'];
+  const confColors = ['var(--danger)', 'var(--warning)', 'var(--primary)', 'var(--success)'];
+
   document.getElementById('flashcardFront').innerHTML = '<h3>' + card.front + '</h3><p class="tag tag-' + card.topic + '">' + ({parametric:'10.6 Parametric',polar:'10.7 Polar',graphs:'10.8 Graphs'}[card.topic]) + '</p>';
   document.getElementById('flashcardBack').innerHTML = '<p>' + card.back.replace(/\n/g,'<br>') + '</p>';
-  document.getElementById('flashcardNav').textContent = 'Card ' + (currentFlashcard+1) + ' of ' + filteredCards.length;
+  document.getElementById('flashcardNav').textContent = 'Card ' + (currentFlashcard + 1) + ' of ' + srQueue.length;
   document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('confidenceLabel').innerHTML = '<span style="color:' + confColors[conf] + '">' + confLabels[conf] + '</span>';
 
-  // Track
-  const idx = flashcards.indexOf(card);
-  progress.flashcardsViewed[idx] = true;
+  progress.flashcardsViewed[entry.global] = true;
+  recordStudyActivity();
   saveProgress();
 }
 
-function flipCard() {
-  document.getElementById('flashcard').classList.toggle('flipped');
-}
+function flipCard() { document.getElementById('flashcard').classList.toggle('flipped'); }
 
-function nextCard() {
-  currentFlashcard = (currentFlashcard + 1) % filteredCards.length;
-  renderFlashcard();
-}
-
-function prevCard() {
-  currentFlashcard = (currentFlashcard - 1 + filteredCards.length) % filteredCards.length;
+function rateCard(rating) {
+  if (srQueue.length === 0) return;
+  const entry = srQueue[currentFlashcard % srQueue.length];
+  if (!progress.cardConfidence) progress.cardConfidence = {};
+  // 0=Again, 1=Hard, 2=Good, 3=Easy
+  if (rating === 0) {
+    progress.cardConfidence[entry.global] = 0;
+  } else if (rating === 1) {
+    progress.cardConfidence[entry.global] = Math.min(1, getCardConfidence(entry.global));
+  } else if (rating === 2) {
+    progress.cardConfidence[entry.global] = Math.min(2, getCardConfidence(entry.global) + 1);
+  } else {
+    progress.cardConfidence[entry.global] = 3;
+  }
+  addXP(5);
+  // Move to next card. If "Again", re-insert near front
+  if (rating === 0) {
+    const item = srQueue.splice(currentFlashcard % srQueue.length, 1)[0];
+    const insertAt = Math.min(currentFlashcard + 3, srQueue.length);
+    srQueue.splice(insertAt, 0, item);
+  } else {
+    currentFlashcard++;
+  }
+  if (currentFlashcard >= srQueue.length) {
+    srQueue = buildSRQueue();
+    currentFlashcard = 0;
+  }
   renderFlashcard();
 }
 
@@ -1128,17 +1594,9 @@ function prevCard() {
 function safeMathEval(expr, t) {
   try {
     const fn = new Function('t','with(Math){return ' + expr
-      .replace(/\^/g,'**')
-      .replace(/sin/g,'Math.sin')
-      .replace(/cos/g,'Math.cos')
-      .replace(/tan/g,'Math.tan')
-      .replace(/sqrt/g,'Math.sqrt')
-      .replace(/abs/g,'Math.abs')
-      .replace(/log/g,'Math.log')
-      .replace(/exp/g,'Math.exp')
-      .replace(/pi/gi,'Math.PI')
-      .replace(/PI/g,'Math.PI')
-      .replace(/e(?![xpa])/g,'Math.E')
+      .replace(/\^/g,'**').replace(/sin/g,'Math.sin').replace(/cos/g,'Math.cos').replace(/tan/g,'Math.tan')
+      .replace(/sqrt/g,'Math.sqrt').replace(/abs/g,'Math.abs').replace(/log/g,'Math.log').replace(/exp/g,'Math.exp')
+      .replace(/pi/gi,'Math.PI').replace(/PI/g,'Math.PI').replace(/e(?![xpa])/g,'Math.E')
       + '}');
     return fn(t);
   } catch(e) { return NaN; }
@@ -1149,13 +1607,10 @@ function drawParametric() {
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0,0,W,H);
-
   const exprX = document.getElementById('paramX').value;
   const exprY = document.getElementById('paramY').value;
   const tMin = parseFloat(document.getElementById('paramTMin').value);
   const tMax = parseFloat(document.getElementById('paramTMax').value);
-
-  // Sample points to find bounds
   const points = [];
   const steps = 500;
   const dt = (tMax - tMin) / steps;
@@ -1165,126 +1620,51 @@ function drawParametric() {
     const y = safeMathEval(exprY, t);
     if (isFinite(x) && isFinite(y)) points.push({x, y, t});
   }
-
   if (points.length < 2) { ctx.fillText('No valid points', W/2-40, H/2); return; }
-
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-  points.forEach(p => { minX = Math.min(minX,p.x); maxX = Math.max(maxX,p.x); minY = Math.min(minY,p.y); maxY = Math.max(maxY,p.y); });
-
-  const rangeX = maxX - minX || 1;
-  const rangeY = maxY - minY || 1;
-  const range = Math.max(rangeX, rangeY) * 1.2;
-  const cx = (minX + maxX) / 2;
-  const cy = (minY + maxY) / 2;
+  points.forEach(p => { minX=Math.min(minX,p.x); maxX=Math.max(maxX,p.x); minY=Math.min(minY,p.y); maxY=Math.max(maxY,p.y); });
+  const rangeX = maxX-minX||1, rangeY = maxY-minY||1;
+  const range = Math.max(rangeX,rangeY)*1.2;
+  const cx = (minX+maxX)/2, cy = (minY+maxY)/2;
   const pad = 50;
-
-  function toScreen(px, py) {
-    return {
-      sx: pad + (px - (cx - range/2)) / range * (W - 2*pad),
-      sy: H - pad - (py - (cy - range/2)) / range * (H - 2*pad)
-    };
-  }
-
+  function toScreen(px,py) { return { sx: pad + (px-(cx-range/2))/range*(W-2*pad), sy: H-pad-(py-(cy-range/2))/range*(H-2*pad) }; }
   // Grid
-  ctx.strokeStyle = '#eee';
-  ctx.lineWidth = 1;
+  ctx.strokeStyle = '#eee'; ctx.lineWidth = 1;
   const gridStep = Math.pow(10, Math.floor(Math.log10(range/5)));
-  const startGridX = Math.floor((cx - range/2) / gridStep) * gridStep;
-  const startGridY = Math.floor((cy - range/2) / gridStep) * gridStep;
-  for (let gx = startGridX; gx <= cx + range/2; gx += gridStep) {
-    const {sx} = toScreen(gx, 0);
-    ctx.beginPath(); ctx.moveTo(sx, pad); ctx.lineTo(sx, H-pad); ctx.stroke();
-  }
-  for (let gy = startGridY; gy <= cy + range/2; gy += gridStep) {
-    const {sy} = toScreen(0, gy);
-    ctx.beginPath(); ctx.moveTo(pad, sy); ctx.lineTo(W-pad, sy); ctx.stroke();
-  }
-
+  for (let gx = Math.floor((cx-range/2)/gridStep)*gridStep; gx <= cx+range/2; gx += gridStep) { const {sx}=toScreen(gx,0); ctx.beginPath(); ctx.moveTo(sx,pad); ctx.lineTo(sx,H-pad); ctx.stroke(); }
+  for (let gy = Math.floor((cy-range/2)/gridStep)*gridStep; gy <= cy+range/2; gy += gridStep) { const {sy}=toScreen(0,gy); ctx.beginPath(); ctx.moveTo(pad,sy); ctx.lineTo(W-pad,sy); ctx.stroke(); }
   // Axes
-  ctx.strokeStyle = '#bbb';
-  ctx.lineWidth = 1.5;
-  const origin = toScreen(0, 0);
-  if (origin.sx >= pad && origin.sx <= W-pad) {
-    ctx.beginPath(); ctx.moveTo(origin.sx, pad); ctx.lineTo(origin.sx, H-pad); ctx.stroke();
-  }
-  if (origin.sy >= pad && origin.sy <= H-pad) {
-    ctx.beginPath(); ctx.moveTo(pad, origin.sy); ctx.lineTo(W-pad, origin.sy); ctx.stroke();
-  }
-
-  // Axis labels
-  ctx.fillStyle = '#999';
-  ctx.font = '11px sans-serif';
-  for (let gx = startGridX; gx <= cx + range/2; gx += gridStep) {
-    if (Math.abs(gx) < gridStep * 0.01) continue;
-    const {sx, sy} = toScreen(gx, 0);
-    const oy = Math.min(Math.max(origin.sy + 14, pad + 14), H - pad);
-    ctx.fillText(Math.round(gx*100)/100, sx - 10, oy);
-  }
-  for (let gy = startGridY; gy <= cy + range/2; gy += gridStep) {
-    if (Math.abs(gy) < gridStep * 0.01) continue;
-    const {sx, sy} = toScreen(0, gy);
-    const ox = Math.max(Math.min(origin.sx - 30, W - pad - 30), pad);
-    ctx.fillText(Math.round(gy*100)/100, ox, sy + 4);
-  }
-
+  ctx.strokeStyle = '#bbb'; ctx.lineWidth = 1.5;
+  const origin = toScreen(0,0);
+  if (origin.sx >= pad && origin.sx <= W-pad) { ctx.beginPath(); ctx.moveTo(origin.sx,pad); ctx.lineTo(origin.sx,H-pad); ctx.stroke(); }
+  if (origin.sy >= pad && origin.sy <= H-pad) { ctx.beginPath(); ctx.moveTo(pad,origin.sy); ctx.lineTo(W-pad,origin.sy); ctx.stroke(); }
   // Curve
-  ctx.strokeStyle = '#6C5CE7';
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
+  ctx.strokeStyle = '#6C5CE7'; ctx.lineWidth = 2.5; ctx.beginPath();
   let started = false;
-  points.forEach(p => {
-    const {sx, sy} = toScreen(p.x, p.y);
-    if (!started) { ctx.moveTo(sx, sy); started = true; }
-    else ctx.lineTo(sx, sy);
-  });
+  points.forEach(p => { const {sx,sy} = toScreen(p.x,p.y); if (!started) { ctx.moveTo(sx,sy); started=true; } else ctx.lineTo(sx,sy); });
   ctx.stroke();
-
-  // Start/end markers
+  // Markers
   if (points.length > 0) {
     const s = toScreen(points[0].x, points[0].y);
-    ctx.fillStyle = '#00b894';
-    ctx.beginPath(); ctx.arc(s.sx, s.sy, 5, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#333';
-    ctx.font = '11px sans-serif';
-    ctx.fillText('t=' + tMin.toFixed(1), s.sx+8, s.sy-4);
-
+    ctx.fillStyle = '#00b894'; ctx.beginPath(); ctx.arc(s.sx,s.sy,5,0,Math.PI*2); ctx.fill();
     const e = toScreen(points[points.length-1].x, points[points.length-1].y);
-    ctx.fillStyle = '#e17055';
-    ctx.beginPath(); ctx.arc(e.sx, e.sy, 5, 0, Math.PI*2); ctx.fill();
-    ctx.fillText('t=' + tMax.toFixed(1), e.sx+8, e.sy-4);
-  }
-
-  // Arrow for orientation (at midpoint)
-  if (points.length > 10) {
-    const mid = Math.floor(points.length / 2);
-    const p1 = toScreen(points[mid-1].x, points[mid-1].y);
-    const p2 = toScreen(points[mid].x, points[mid].y);
-    const angle = Math.atan2(p2.sy - p1.sy, p2.sx - p1.sx);
-    ctx.fillStyle = '#6C5CE7';
-    ctx.beginPath();
-    ctx.moveTo(p2.sx, p2.sy);
-    ctx.lineTo(p2.sx - 10*Math.cos(angle-0.4), p2.sy - 10*Math.sin(angle-0.4));
-    ctx.lineTo(p2.sx - 10*Math.cos(angle+0.4), p2.sy - 10*Math.sin(angle+0.4));
-    ctx.closePath();
-    ctx.fill();
+    ctx.fillStyle = '#e17055'; ctx.beginPath(); ctx.arc(e.sx,e.sy,5,0,Math.PI*2); ctx.fill();
   }
 }
 
 function setParametricPreset(name) {
   const presets = {
-    ellipse: { x:'3*cos(t)', y:'4*sin(t)', tMin:0, tMax:6.2832, info:'Ellipse: x=3cosθ, y=4sinθ. Rectangular: x²/9 + y²/16 = 1' },
-    parabola: { x:'t*t - 4', y:'t/2', tMin:-3, tMax:3, info:'Parabola: x=t²−4, y=t/2. Rectangular: x = 4y² − 4' },
-    cycloid: { x:'t - sin(t)', y:'1 - cos(t)', tMin:0, tMax:12.566, info:'Cycloid (a=1): x=θ−sinθ, y=1−cosθ. Traced by a point on a rolling circle.' },
-    projectile: { x:'24*sqrt(2)*t', y:'-16*t*t + 24*sqrt(2)*t', tMin:0, tMax:2.12, info:'Projectile: v₀=48 ft/s, θ=45°. x=24√2·t, y=−16t²+24√2·t' },
-    lissajous: { x:'2*cos(t)', y:'sin(2*t)', tMin:0, tMax:6.2832, info:'Lissajous curve: x=2cosθ, y=sin2θ. Creates a figure-8 pattern.' },
-    epicycloid: { x:'8*cos(t) - 2*cos(4*t)', y:'8*sin(t) - 2*sin(4*t)', tMin:0, tMax:6.2832, info:'Epicycloid: Small circle rolling outside a larger circle.' },
-    hypocycloid: { x:'3*cos(t)*cos(t)*cos(t)', y:'3*sin(t)*sin(t)*sin(t)', tMin:0, tMax:6.2832, info:'Hypocycloid (astroid): x=3cos³θ, y=3sin³θ. Has 4 cusps.' },
+    ellipse: { x:'3*cos(t)', y:'4*sin(t)', tMin:0, tMax:6.2832, info:'Ellipse: x=3cos t, y=4sin t' },
+    parabola: { x:'t*t - 4', y:'t/2', tMin:-3, tMax:3, info:'Parabola: x=t^2-4, y=t/2' },
+    cycloid: { x:'t - sin(t)', y:'1 - cos(t)', tMin:0, tMax:12.566, info:'Cycloid (a=1)' },
+    projectile: { x:'24*sqrt(2)*t', y:'-16*t*t + 24*sqrt(2)*t', tMin:0, tMax:2.12, info:'Projectile: v0=48, angle=45 deg' },
+    lissajous: { x:'2*cos(t)', y:'sin(2*t)', tMin:0, tMax:6.2832, info:'Lissajous figure-8' },
+    epicycloid: { x:'8*cos(t) - 2*cos(4*t)', y:'8*sin(t) - 2*sin(4*t)', tMin:0, tMax:6.2832, info:'Epicycloid' },
+    hypocycloid: { x:'3*cos(t)*cos(t)*cos(t)', y:'3*sin(t)*sin(t)*sin(t)', tMin:0, tMax:6.2832, info:'Hypocycloid (astroid)' },
   };
   const p = presets[name];
-  document.getElementById('paramX').value = p.x;
-  document.getElementById('paramY').value = p.y;
-  document.getElementById('paramTMin').value = p.tMin;
-  document.getElementById('paramTMax').value = p.tMax;
+  document.getElementById('paramX').value = p.x; document.getElementById('paramY').value = p.y;
+  document.getElementById('paramTMin').value = p.tMin; document.getElementById('paramTMax').value = p.tMax;
   document.getElementById('parametricInfo').textContent = p.info;
   drawParametric();
 }
@@ -1295,136 +1675,47 @@ function drawPolar() {
   const ctx = canvas.getContext('2d');
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0,0,W,H);
-
   const expr = document.getElementById('polarEq').value;
   const tMin = parseFloat(document.getElementById('polarTMin').value);
   const tMax = parseFloat(document.getElementById('polarTMax').value);
-
-  // Determine if this is an r² equation
-  const isRSquared = expr.includes('r2') || expr.includes('r²');
-
-  const points = [];
-  const steps = 800;
-  const dt = (tMax - tMin) / steps;
-
-  let maxR = 0;
+  const points = []; const steps = 800; const dt = (tMax-tMin)/steps; let maxR = 0;
   for (let i = 0; i <= steps; i++) {
-    const t = tMin + i * dt;
-    let r = safeMathEval(expr, t);
-    if (isFinite(r)) {
-      const x = r * Math.cos(t);
-      const y = r * Math.sin(t);
-      points.push({x, y, r, t});
-      maxR = Math.max(maxR, Math.abs(r));
-    }
+    const t = tMin + i*dt; let r = safeMathEval(expr,t);
+    if (isFinite(r)) { points.push({x:r*Math.cos(t),y:r*Math.sin(t),r,t}); maxR = Math.max(maxR, Math.abs(r)); }
   }
-
   if (points.length < 2 || maxR === 0) { ctx.fillText('No valid points', W/2-40, H/2); return; }
-
-  const scale = (W/2 - 60) / maxR;
-  const cX = W/2, cY = H/2;
-
-  // Polar grid - circles
-  ctx.strokeStyle = '#e8e8e8';
-  ctx.lineWidth = 0.8;
+  const scale = (W/2-60)/maxR, cX = W/2, cY = H/2;
+  // Grid circles
+  ctx.strokeStyle = '#e8e8e8'; ctx.lineWidth = 0.8;
   const ringStep = maxR > 10 ? Math.ceil(maxR/5) : maxR > 4 ? Math.ceil(maxR/4) : maxR > 1 ? 1 : maxR/4;
-  ctx.fillStyle = '#bbb';
-  ctx.font = '10px sans-serif';
-  for (let r = ringStep; r <= maxR * 1.1; r += ringStep) {
-    ctx.beginPath();
-    ctx.arc(cX, cY, r * scale, 0, Math.PI*2);
-    ctx.stroke();
-    ctx.fillText(Math.round(r*10)/10, cX + r*scale + 3, cY - 3);
-  }
-
-  // Polar grid - rays
-  for (let a = 0; a < 12; a++) {
-    const angle = a * Math.PI / 6;
-    ctx.beginPath();
-    ctx.moveTo(cX, cY);
-    ctx.lineTo(cX + Math.cos(angle) * (maxR*1.1) * scale, cY - Math.sin(angle) * (maxR*1.1) * scale);
-    ctx.stroke();
-  }
-
-  // Angle labels
-  const labels = ['0','π/6','π/3','π/2','2π/3','5π/6','π','7π/6','4π/3','3π/2','5π/3','11π/6'];
-  ctx.fillStyle = '#999';
-  ctx.font = '11px sans-serif';
-  for (let a = 0; a < 12; a++) {
-    const angle = a * Math.PI / 6;
-    const lx = cX + Math.cos(angle) * (maxR*1.15) * scale;
-    const ly = cY - Math.sin(angle) * (maxR*1.15) * scale;
-    ctx.fillText(labels[a], lx - 10, ly + 4);
-  }
-
+  for (let r = ringStep; r <= maxR*1.1; r += ringStep) { ctx.beginPath(); ctx.arc(cX,cY,r*scale,0,Math.PI*2); ctx.stroke(); }
+  // Grid rays
+  for (let a = 0; a < 12; a++) { const angle = a*Math.PI/6; ctx.beginPath(); ctx.moveTo(cX,cY); ctx.lineTo(cX+Math.cos(angle)*maxR*1.1*scale, cY-Math.sin(angle)*maxR*1.1*scale); ctx.stroke(); }
   // Axes
-  ctx.strokeStyle = '#bbb';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.moveTo(40, cY); ctx.lineTo(W-40, cY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cX, 40); ctx.lineTo(cX, H-40); ctx.stroke();
-
+  ctx.strokeStyle = '#bbb'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(40,cY); ctx.lineTo(W-40,cY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cX,40); ctx.lineTo(cX,H-40); ctx.stroke();
   // Curve
-  ctx.strokeStyle = '#00cec9';
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
+  ctx.strokeStyle = '#00cec9'; ctx.lineWidth = 2.5; ctx.beginPath();
   let started = false;
-  points.forEach(p => {
-    const sx = cX + p.x * scale;
-    const sy = cY - p.y * scale;
-    if (!started) { ctx.moveTo(sx, sy); started = true; }
-    else ctx.lineTo(sx, sy);
-  });
+  points.forEach(p => { const sx=cX+p.x*scale, sy=cY-p.y*scale; if (!started) { ctx.moveTo(sx,sy); started=true; } else ctx.lineTo(sx,sy); });
   ctx.stroke();
-
-  // Arrow for orientation
-  if (points.length > 10) {
-    const mid = Math.floor(points.length * 0.6);
-    const p1x = cX + points[mid-1].x * scale;
-    const p1y = cY - points[mid-1].y * scale;
-    const p2x = cX + points[mid].x * scale;
-    const p2y = cY - points[mid].y * scale;
-    const angle = Math.atan2(p2y - p1y, p2x - p1x);
-    ctx.fillStyle = '#00cec9';
-    ctx.beginPath();
-    ctx.moveTo(p2x, p2y);
-    ctx.lineTo(p2x - 10*Math.cos(angle-0.4), p2y - 10*Math.sin(angle-0.4));
-    ctx.lineTo(p2x - 10*Math.cos(angle+0.4), p2y - 10*Math.sin(angle+0.4));
-    ctx.closePath();
-    ctx.fill();
-  }
 }
 
 function setPolarPreset(name) {
   const presets = {
-    cardioid: { eq:'2*(1 + cos(t))', tMin:0, tMax:6.2832, info:'Cardioid: r = 2(1+cosθ). a/b = 1. Heart-shaped limaçon. Max r = 4 at θ=0.' },
-    limacon: { eq:'3 + 2*cos(t)', tMin:0, tMax:6.2832, info:'Dimpled limaçon: r = 3+2cosθ. a/b = 3/2 (between 1 and 2). No inner loop.' },
-    'limacon-inner': { eq:'1 - 2*cos(t)', tMin:0, tMax:6.2832, info:'Limaçon with inner loop: r = 1−2cosθ. a/b = 1/2 < 1. Negative r creates inner loop.' },
-    rose3: { eq:'3*cos(3*t)', tMin:0, tMax:3.1416, info:'Rose curve: r = 3cos3θ. n=3 (odd) → 3 petals. Each petal has length 3.' },
-    rose4: { eq:'3*cos(2*t)', tMin:0, tMax:6.2832, info:'Rose curve: r = 3cos2θ. n=2 (even) → 2n = 4 petals. Each petal has length 3.' },
-    lemniscate: { eq:'3*sqrt(abs(cos(2*t)))*((cos(2*t)>=0)?1:0) + (-3*sqrt(abs(cos(2*t))))*((cos(2*t)<0)?0:0)', tMin:0, tMax:6.2832, info:'Lemniscate: r²=9cos2θ. Figure-8. Only defined where cos2θ ≥ 0.' },
-    circle: { eq:'4*sin(t)', tMin:0, tMax:3.1416, info:'Circle: r = 4sinθ. Centered at (0,2), radius 2. Rectangular: x²+(y−2)²=4.' },
-    spiral: { eq:'t', tMin:0, tMax:18.85, info:'Spiral of Archimedes: r = θ. Distance from pole increases linearly with angle.' },
+    cardioid: { eq:'2*(1 + cos(t))', tMin:0, tMax:6.2832, info:'Cardioid: r=2(1+cos t)' },
+    limacon: { eq:'3 + 2*cos(t)', tMin:0, tMax:6.2832, info:'Dimpled limacon: r=3+2cos t' },
+    'limacon-inner': { eq:'1 - 2*cos(t)', tMin:0, tMax:6.2832, info:'Limacon with inner loop' },
+    rose3: { eq:'3*cos(3*t)', tMin:0, tMax:3.1416, info:'Rose: 3 petals' },
+    rose4: { eq:'3*cos(2*t)', tMin:0, tMax:6.2832, info:'Rose: 4 petals' },
+    lemniscate: { eq:'3*sqrt(abs(cos(2*t)))', tMin:0, tMax:6.2832, info:'Lemniscate' },
+    circle: { eq:'4*sin(t)', tMin:0, tMax:3.1416, info:'Circle: r=4sin t' },
+    spiral: { eq:'t', tMin:0, tMax:18.85, info:'Spiral of Archimedes' },
   };
-  // Fix lemniscate
-  if (name === 'lemniscate') {
-    presets.lemniscate.eq = '3*sqrt(abs(cos(2*t)))';
-    presets.lemniscate.tMin = -0.7854;
-    presets.lemniscate.tMax = 0.7854;
-  }
   const p = presets[name];
-  document.getElementById('polarEq').value = p.eq;
-  document.getElementById('polarTMin').value = p.tMin;
-  document.getElementById('polarTMax').value = p.tMax;
-  document.getElementById('polarInfo').textContent = p.info;
-
-  // Special handling for lemniscate: draw both loops
-  if (name === 'lemniscate') {
-    document.getElementById('polarEq').value = '3*sqrt(abs(cos(2*t)))';
-    document.getElementById('polarTMin').value = 0;
-    document.getElementById('polarTMax').value = 6.2832;
-  }
-
-  drawPolar();
+  document.getElementById('polarEq').value = p.eq; document.getElementById('polarTMin').value = p.tMin; document.getElementById('polarTMax').value = p.tMax;
+  document.getElementById('polarInfo').textContent = p.info; drawPolar();
 }
 
 // ==================== QUIZ ====================
@@ -1439,26 +1730,32 @@ function generateQuiz() {
   quizAnswered = false;
   document.getElementById('quizSubmitBtn').style.display = 'inline-block';
   const pool = quizTopic === 'all' ? [...quizBank] : quizBank.filter(q => q.topic === quizTopic);
-
-  // Shuffle and pick 5
   const shuffled = pool.sort(() => Math.random() - 0.5);
   currentQuiz = shuffled.slice(0, Math.min(5, shuffled.length));
+  renderQuizQuestions(currentQuiz, 'quizArea');
+}
 
+function renderQuizQuestions(questions, containerId) {
   let html = '';
-  currentQuiz.forEach((q, idx) => {
+  questions.forEach((q, idx) => {
     const tag = {parametric:'tag-parametric',polar:'tag-polar',graphs:'tag-graphs'}[q.topic];
     const tagText = {parametric:'10.6',polar:'10.7',graphs:'10.8'}[q.topic];
     html += '<div class="quiz-question" id="qq-' + idx + '">';
     html += '<h3><span class="tag ' + tag + '">' + tagText + '</span> ' + (idx+1) + '. ' + q.q + '</h3>';
-    html += '<div class="quiz-options">';
-    q.options.forEach((opt, oi) => {
-      html += '<div class="quiz-option" data-q="' + idx + '" data-o="' + oi + '" onclick="selectOption(' + idx + ',' + oi + ')">' + opt + '</div>';
-    });
-    html += '</div>';
+    if (q.type === 'input') {
+      html += '<input type="text" class="quiz-input" id="qi-' + idx + '" placeholder="Type your answer..." autocomplete="off">';
+    } else {
+      html += '<div class="quiz-options">';
+      q.options.forEach((opt, oi) => {
+        html += '<div class="quiz-option" data-q="' + idx + '" data-o="' + oi + '" onclick="selectOption(' + idx + ',' + oi + ')">' + opt + '</div>';
+      });
+      html += '</div>';
+    }
     html += '<div class="quiz-feedback" id="qf-' + idx + '"></div>';
+    html += '<div class="explain-why-box" id="ew-' + idx + '"><label>In your own words, explain why this is correct:</label><textarea placeholder="Type your explanation..."></textarea><button class="btn btn-small btn-outline reveal-btn" onclick="this.nextElementSibling.style.display=\'block\'">Show Explanation</button><p style="display:none;margin-top:8px;font-size:0.85rem;color:var(--text-light)">' + (q.explanation||'') + '</p></div>';
     html += '</div>';
   });
-  document.getElementById('quizArea').innerHTML = html;
+  document.getElementById(containerId).innerHTML = html;
 }
 
 function selectOption(qIdx, oIdx) {
@@ -1471,61 +1768,86 @@ function selectOption(qIdx, oIdx) {
 function submitQuiz() {
   if (quizAnswered) return;
   quizAnswered = true;
-
   let correct = 0;
   currentQuiz.forEach((q, idx) => {
     const fb = document.getElementById('qf-' + idx);
-    const userAns = q.userAnswer;
-
-    if (userAns === undefined) {
-      fb.textContent = 'No answer selected. ' + q.explanation;
-      fb.className = 'quiz-feedback show incorrect';
-      document.querySelector('[data-q="' + idx + '"][data-o="' + q.correct + '"]').classList.add('show-correct');
-      return;
-    }
-
-    document.querySelectorAll('[data-q="' + idx + '"]').forEach(el => el.classList.remove('selected'));
-    if (userAns === q.correct) {
-      correct++;
-      document.querySelector('[data-q="' + idx + '"][data-o="' + userAns + '"]').classList.add('correct');
-      fb.textContent = 'Correct! ' + q.explanation;
-      fb.className = 'quiz-feedback show correct';
+    if (q.type === 'input') {
+      const inputEl = document.getElementById('qi-' + idx);
+      const userVal = parseFloat(inputEl.value);
+      const correctVal = parseFloat(q.answer);
+      const tol = q.tolerance || 0.01;
+      if (!isNaN(userVal) && Math.abs(userVal - correctVal) <= tol) {
+        correct++;
+        inputEl.classList.add('correct');
+        fb.textContent = 'Correct! ' + q.explanation;
+        fb.className = 'quiz-feedback show correct';
+        addXP(15);
+        // Explain Why (40% chance on correct)
+        if (Math.random() < 0.4) document.getElementById('ew-' + idx).classList.add('show');
+      } else {
+        inputEl.classList.add('incorrect');
+        fb.textContent = 'Incorrect. Answer: ' + q.answer + '. ' + q.explanation;
+        fb.className = 'quiz-feedback show incorrect';
+      }
+      q.userAnswer = isNaN(userVal) ? undefined : userVal;
+      q.wasCorrect = !isNaN(userVal) && Math.abs(userVal - correctVal) <= tol;
     } else {
-      document.querySelector('[data-q="' + idx + '"][data-o="' + userAns + '"]').classList.add('incorrect');
-      document.querySelector('[data-q="' + idx + '"][data-o="' + q.correct + '"]').classList.add('show-correct');
-      fb.textContent = 'Incorrect. ' + q.explanation;
-      fb.className = 'quiz-feedback show incorrect';
+      const userAns = q.userAnswer;
+      if (userAns === undefined) {
+        fb.textContent = 'No answer selected. ' + q.explanation;
+        fb.className = 'quiz-feedback show incorrect';
+        document.querySelector('[data-q="'+idx+'"][data-o="'+q.correct+'"]').classList.add('show-correct');
+        q.wasCorrect = false;
+      } else {
+        document.querySelectorAll('[data-q="'+idx+'"]').forEach(el => el.classList.remove('selected'));
+        if (userAns === q.correct) {
+          correct++;
+          document.querySelector('[data-q="'+idx+'"][data-o="'+userAns+'"]').classList.add('correct');
+          fb.textContent = 'Correct! ' + q.explanation;
+          fb.className = 'quiz-feedback show correct';
+          addXP(10);
+          if (Math.random() < 0.4) document.getElementById('ew-' + idx).classList.add('show');
+          q.wasCorrect = true;
+        } else {
+          document.querySelector('[data-q="'+idx+'"][data-o="'+userAns+'"]').classList.add('incorrect');
+          document.querySelector('[data-q="'+idx+'"][data-o="'+q.correct+'"]').classList.add('show-correct');
+          fb.textContent = 'Incorrect. ' + q.explanation;
+          fb.className = 'quiz-feedback show incorrect';
+          q.wasCorrect = false;
+        }
+      }
     }
   });
 
   const score = currentQuiz.length > 0 ? correct / currentQuiz.length : 0;
+  if (score === 1) addXP(50); // perfect bonus
 
-  // Save missed questions
+  // Save missed
   currentQuiz.forEach(q => {
-    const missed = (q.userAnswer === undefined || q.userAnswer !== q.correct);
-    const qKey = q.q; // use question text as unique key
-    const alreadySaved = progress.missedQuestions.some(m => m.q === qKey);
-    if (missed && !alreadySaved) {
+    const qKey = q.q;
+    const alreadySaved = (progress.missedQuestions||[]).some(m => m.q === qKey);
+    if (!q.wasCorrect && !alreadySaved) {
       progress.missedQuestions.push(q);
-    } else if (!missed && alreadySaved) {
-      // Remove from missed if they got it right this time
+    } else if (q.wasCorrect && alreadySaved) {
       progress.missedQuestions = progress.missedQuestions.filter(m => m.q !== qKey);
     }
   });
 
-  // Save scores by topic
+  // Save scores
   const topics = [...new Set(currentQuiz.map(q => q.topic))];
   topics.forEach(t => {
-    const topicQs = currentQuiz.filter(q => q.topic === t);
-    const topicCorrect = topicQs.filter(q => q.userAnswer === q.correct).length;
-    progress.quizScores[t].push(topicCorrect / topicQs.length);
+    const tQs = currentQuiz.filter(q => q.topic === t);
+    const tCorrect = tQs.filter(q => q.wasCorrect).length;
+    if (!progress.quizScores[t]) progress.quizScores[t] = [];
+    progress.quizScores[t].push(tCorrect / tQs.length);
     if (progress.quizScores[t].length > 10) progress.quizScores[t].shift();
   });
+
+  progress.totalAnswered = (progress.totalAnswered || 0) + currentQuiz.length;
+  recordStudyActivity();
   saveProgress();
 
   document.getElementById('quizSubmitBtn').style.display = 'none';
-
-  // Add score summary
   const scoreDiv = document.createElement('div');
   scoreDiv.className = 'quiz-score';
   scoreDiv.innerHTML = '<div class="score-num">' + correct + '/' + currentQuiz.length + '</div><div class="score-label">' + Math.round(score*100) + '% Correct</div>';
@@ -1533,92 +1855,328 @@ function submitQuiz() {
 }
 
 function reviewMissed() {
-  if (progress.missedQuestions.length === 0) return;
+  if (!progress.missedQuestions || progress.missedQuestions.length === 0) return;
   quizAnswered = false;
   document.getElementById('quizSubmitBtn').style.display = 'inline-block';
   currentQuiz = [...progress.missedQuestions].sort(() => Math.random() - 0.5);
-
-  let html = '<div style="padding:12px 16px;background:#fff5f3;border:1px solid var(--danger);border-radius:10px;margin-bottom:16px;font-size:0.9rem;color:var(--danger);font-weight:600;">Reviewing ' + currentQuiz.length + ' missed question' + (currentQuiz.length > 1 ? 's' : '') + ' — get them right to remove them from this list</div>';
+  let html = '<div style="padding:12px 16px;background:#fff5f3;border:1px solid var(--danger);border-radius:10px;margin-bottom:16px;font-size:0.9rem;color:var(--danger);font-weight:600;">Reviewing ' + currentQuiz.length + ' missed question' + (currentQuiz.length>1?'s':'') + '</div>';
   currentQuiz.forEach((q, idx) => {
     const tag = {parametric:'tag-parametric',polar:'tag-polar',graphs:'tag-graphs'}[q.topic];
     const tagText = {parametric:'10.6',polar:'10.7',graphs:'10.8'}[q.topic];
-    html += '<div class="quiz-question" id="qq-' + idx + '">';
-    html += '<h3><span class="tag ' + tag + '">' + tagText + '</span> ' + (idx+1) + '. ' + q.q + '</h3>';
-    html += '<div class="quiz-options">';
-    q.options.forEach((opt, oi) => {
-      html += '<div class="quiz-option" data-q="' + idx + '" data-o="' + oi + '" onclick="selectOption(' + idx + ',' + oi + ')">' + opt + '</div>';
-    });
-    html += '</div>';
-    html += '<div class="quiz-feedback" id="qf-' + idx + '"></div>';
+    html += '<div class="quiz-question" id="qq-'+idx+'"><h3><span class="tag '+tag+'">'+tagText+'</span> '+(idx+1)+'. '+q.q+'</h3>';
+    if (q.type === 'input') {
+      html += '<input type="text" class="quiz-input" id="qi-'+idx+'" placeholder="Type your answer..." autocomplete="off">';
+    } else {
+      html += '<div class="quiz-options">';
+      (q.options||[]).forEach((opt,oi) => { html += '<div class="quiz-option" data-q="'+idx+'" data-o="'+oi+'" onclick="selectOption('+idx+','+oi+')">'+opt+'</div>'; });
+      html += '</div>';
+    }
+    html += '<div class="quiz-feedback" id="qf-'+idx+'"></div>';
+    html += '<div class="explain-why-box" id="ew-'+idx+'"><label>Explain why:</label><textarea placeholder="Type..."></textarea><button class="btn btn-small btn-outline reveal-btn" onclick="this.nextElementSibling.style.display=\'block\'">Show Explanation</button><p style="display:none;margin-top:8px;font-size:0.85rem;color:var(--text-light)">'+(q.explanation||'')+'</p></div>';
     html += '</div>';
   });
   document.getElementById('quizArea').innerHTML = html;
 }
 
 function clearMissed() {
-  if (confirm('Clear all ' + progress.missedQuestions.length + ' missed questions?')) {
-    progress.missedQuestions = [];
-    saveProgress();
-  }
+  if (confirm('Clear all missed questions?')) { progress.missedQuestions = []; saveProgress(); }
 }
 
-// ==================== WALKTHROUGHS ====================
+// ==================== TIMED QUIZ ====================
+function selectTimedOption(el, key, value) {
+  el.parentElement.querySelectorAll('.timed-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  timedConfig[key === 'timedTime' ? 'time' : 'topic'] = value;
+}
+
+function startTimedQuiz() {
+  const pool = timedConfig.topic === 'all' ? [...quizBank] : quizBank.filter(q => q.topic === timedConfig.topic);
+  timedState.questions = pool.sort(() => Math.random() - 0.5);
+  timedState.current = 0;
+  timedState.correct = 0;
+  timedState.answered = 0;
+  timedState.remaining = timedConfig.time;
+  timedState.active = true;
+  document.getElementById('timedSetup').style.display = 'none';
+  document.getElementById('timedActive').style.display = 'block';
+  document.getElementById('timedResults').style.display = 'none';
+  renderTimedQuestion();
+  timedState.timer = setInterval(timedTick, 1000);
+}
+
+function timedTick() {
+  timedState.remaining--;
+  const min = Math.floor(timedState.remaining / 60);
+  const sec = timedState.remaining % 60;
+  const display = document.getElementById('timerDisplay');
+  display.textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
+  display.classList.toggle('urgent', timedState.remaining <= 30);
+  if (timedState.remaining <= 0) endTimedQuiz();
+}
+
+function renderTimedQuestion() {
+  if (timedState.current >= timedState.questions.length) { endTimedQuiz(); return; }
+  const q = timedState.questions[timedState.current];
+  const tag = {parametric:'tag-parametric',polar:'tag-polar',graphs:'tag-graphs'}[q.topic];
+  const tagText = {parametric:'10.6',polar:'10.7',graphs:'10.8'}[q.topic];
+  let html = '<div class="quiz-question"><h3><span class="tag '+tag+'">'+tagText+'</span> '+q.q+'</h3>';
+  if (q.type === 'input') {
+    html += '<input type="text" class="quiz-input" id="timed-input" placeholder="Type your answer..." autocomplete="off">';
+  } else {
+    html += '<div class="quiz-options">';
+    q.options.forEach((opt,oi) => { html += '<div class="quiz-option" data-q="tq" data-o="'+oi+'" onclick="selectTimedAnswer('+oi+')">'+opt+'</div>'; });
+    html += '</div>';
+  }
+  html += '<div class="quiz-feedback" id="timed-fb"></div></div>';
+  document.getElementById('timedQuestion').innerHTML = html;
+  document.getElementById('timedProgressText').textContent = 'Question ' + (timedState.current+1) + ' | ' + timedState.correct + ' correct';
+  timedState.currentAnswer = undefined;
+}
+
+function selectTimedAnswer(oi) {
+  document.querySelectorAll('[data-q="tq"]').forEach(el => el.classList.remove('selected'));
+  document.querySelector('[data-q="tq"][data-o="'+oi+'"]').classList.add('selected');
+  timedState.currentAnswer = oi;
+}
+
+function timedNext() {
+  const q = timedState.questions[timedState.current];
+  const fb = document.getElementById('timed-fb');
+  let wasCorrect = false;
+
+  if (q.type === 'input') {
+    const inputEl = document.getElementById('timed-input');
+    const userVal = parseFloat(inputEl.value);
+    const correctVal = parseFloat(q.answer);
+    wasCorrect = !isNaN(userVal) && Math.abs(userVal - correctVal) <= (q.tolerance || 0.01);
+    if (wasCorrect) { inputEl.classList.add('correct'); addXP(15); }
+    else { inputEl.classList.add('incorrect'); fb.textContent = 'Answer: ' + q.answer; fb.className = 'quiz-feedback show incorrect'; }
+  } else {
+    const ans = timedState.currentAnswer;
+    if (ans !== undefined) {
+      document.querySelectorAll('[data-q="tq"]').forEach(el => el.classList.remove('selected'));
+      if (ans === q.correct) {
+        document.querySelector('[data-q="tq"][data-o="'+ans+'"]').classList.add('correct');
+        wasCorrect = true;
+        addXP(10);
+      } else {
+        document.querySelector('[data-q="tq"][data-o="'+ans+'"]').classList.add('incorrect');
+        document.querySelector('[data-q="tq"][data-o="'+q.correct+'"]').classList.add('show-correct');
+      }
+    } else {
+      document.querySelector('[data-q="tq"][data-o="'+q.correct+'"]').classList.add('show-correct');
+    }
+  }
+
+  if (wasCorrect) timedState.correct++;
+  timedState.answered++;
+  timedState.current++;
+  recordStudyActivity();
+
+  setTimeout(() => {
+    if (timedState.active && timedState.current < timedState.questions.length) renderTimedQuestion();
+    else endTimedQuiz();
+  }, wasCorrect ? 300 : 1200);
+}
+
+function endTimedQuiz() {
+  timedState.active = false;
+  clearInterval(timedState.timer);
+  document.getElementById('timedActive').style.display = 'none';
+  document.getElementById('timedResults').style.display = 'block';
+  const pct = timedState.answered > 0 ? Math.round(timedState.correct / timedState.answered * 100) : 0;
+  addXP(25); // completion bonus
+  progress.totalAnswered = (progress.totalAnswered || 0) + timedState.answered;
+  saveProgress();
+  document.getElementById('timedResults').innerHTML =
+    '<div class="quiz-score"><div class="score-num">' + timedState.correct + '/' + timedState.answered + '</div>' +
+    '<div class="score-label">' + pct + '% Correct</div>' +
+    '<div style="margin-top:12px;font-size:0.9rem;opacity:0.8">+25 XP completion bonus</div></div>' +
+    '<button class="btn btn-primary" style="margin-top:16px;width:100%" onclick="resetTimedQuiz()">Try Again</button>';
+}
+
+function resetTimedQuiz() {
+  document.getElementById('timedSetup').style.display = 'block';
+  document.getElementById('timedActive').style.display = 'none';
+  document.getElementById('timedResults').style.display = 'none';
+}
+
+// ==================== CONVERTER ====================
+let convPoint = { x: 0, y: 0 };
+const CONV_RANGE = 6;
+
+function drawConverter() {
+  const canvas = document.getElementById('converterCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const cX = W/2, cY = H/2;
+  const unit = (W-60) / (CONV_RANGE*2);
+
+  // Grid
+  ctx.strokeStyle = '#e8e8e8'; ctx.lineWidth = 0.5;
+  for (let i = -CONV_RANGE; i <= CONV_RANGE; i++) {
+    const sx = cX + i*unit, sy = cY - i*unit;
+    ctx.beginPath(); ctx.moveTo(sx,30); ctx.lineTo(sx,H-30); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(30,sy); ctx.lineTo(W-30,sy); ctx.stroke();
+  }
+
+  // Polar circles
+  ctx.strokeStyle = 'rgba(108,92,231,0.15)'; ctx.lineWidth = 0.8;
+  for (let r = 1; r <= CONV_RANGE; r++) {
+    ctx.beginPath(); ctx.arc(cX, cY, r*unit, 0, Math.PI*2); ctx.stroke();
+  }
+  // Polar rays
+  for (let a = 0; a < 12; a++) {
+    const angle = a * Math.PI/6;
+    ctx.beginPath(); ctx.moveTo(cX,cY); ctx.lineTo(cX + Math.cos(angle)*CONV_RANGE*unit, cY - Math.sin(angle)*CONV_RANGE*unit); ctx.stroke();
+  }
+
+  // Axes
+  ctx.strokeStyle = '#999'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(30,cY); ctx.lineTo(W-30,cY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cX,30); ctx.lineTo(cX,H-30); ctx.stroke();
+
+  // Labels
+  ctx.fillStyle = '#999'; ctx.font = '10px sans-serif';
+  for (let i = -CONV_RANGE; i <= CONV_RANGE; i++) {
+    if (i === 0) continue;
+    ctx.fillText(i, cX + i*unit - 4, cY + 14);
+    ctx.fillText(i, cX + 6, cY - i*unit + 4);
+  }
+
+  // Point
+  const px = cX + convPoint.x * unit;
+  const py = cY - convPoint.y * unit;
+
+  // Dashed lines to axes
+  ctx.setLineDash([4,4]); ctx.strokeStyle = 'var(--primary)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(px, cY); ctx.lineTo(px, py); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cX, py); ctx.lineTo(px, py); ctx.stroke();
+  // Line from origin (r)
+  ctx.strokeStyle = 'var(--secondary)';
+  ctx.beginPath(); ctx.moveTo(cX, cY); ctx.lineTo(px, py); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Angle arc
+  const r = Math.sqrt(convPoint.x*convPoint.x + convPoint.y*convPoint.y);
+  if (r > 0.2) {
+    const theta = Math.atan2(convPoint.y, convPoint.x);
+    const arcR = Math.min(30, r*unit*0.3);
+    ctx.strokeStyle = 'var(--accent)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(cX, cY, arcR, 0, -theta, theta > 0); ctx.stroke();
+  }
+
+  // Point dot
+  ctx.fillStyle = '#6C5CE7';
+  ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'white';
+  ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI*2); ctx.fill();
+}
+
+function updateConverterDisplays() {
+  const x = convPoint.x, y = convPoint.y;
+  const r = Math.sqrt(x*x + y*y);
+  const theta = Math.atan2(y, x);
+  const thetaDeg = theta * 180 / Math.PI;
+
+  document.getElementById('convRectCoord').textContent = '(' + x.toFixed(2) + ', ' + y.toFixed(2) + ')';
+  document.getElementById('convPolarCoord').textContent = '(' + r.toFixed(2) + ', ' + theta.toFixed(3) + ')';
+  document.getElementById('convPolarDetail').textContent = 'r = ' + r.toFixed(2) + ', \u03B8 = ' + theta.toFixed(3) + ' rad = ' + thetaDeg.toFixed(1) + '\u00B0';
+
+  document.getElementById('convX').value = x.toFixed(2);
+  document.getElementById('convY').value = y.toFixed(2);
+  document.getElementById('convR').value = r.toFixed(2);
+  document.getElementById('convTheta').value = theta.toFixed(3);
+
+  drawConverter();
+}
+
+function convFromRect() {
+  convPoint.x = parseFloat(document.getElementById('convX').value) || 0;
+  convPoint.y = parseFloat(document.getElementById('convY').value) || 0;
+  updateConverterDisplays();
+}
+
+function convFromPolar() {
+  const r = parseFloat(document.getElementById('convR').value) || 0;
+  const theta = parseFloat(document.getElementById('convTheta').value) || 0;
+  convPoint.x = r * Math.cos(theta);
+  convPoint.y = r * Math.sin(theta);
+  updateConverterDisplays();
+}
+
+function setupConverterClick() {
+  const canvas = document.getElementById('converterCanvas');
+  canvas.addEventListener('click', function(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const cx = canvas.width/2, cy = canvas.height/2;
+    const unit = (canvas.width-60) / (CONV_RANGE*2);
+    const mx = (e.clientX - rect.left) * scaleX;
+    const my = (e.clientY - rect.top) * scaleY;
+    convPoint.x = Math.round(((mx - cx) / unit) * 4) / 4;
+    convPoint.y = Math.round(((cy - my) / unit) * 4) / 4;
+    updateConverterDisplays();
+  });
+}
+
+// ==================== WALKTHROUGHS + RANDOM PROBLEM GEN ====================
 function showWalkthrough(type) {
   const area = document.getElementById('walkthroughArea');
   document.querySelectorAll('#sec-walkthroughs .topic-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  if (event && event.target) event.target.classList.add('active');
 
   const walkthroughs = {
     'elim-param': {
       title: 'Eliminating the Parameter',
-      problem: 'Given x = t² − 4 and y = t/2, find the rectangular equation.',
+      problem: 'Given x = t^2 - 4 and y = t/2, find the rectangular equation.',
       steps: [
-        { num:'Step 1: Choose the simpler equation', text:'Look at both equations and pick the one that\'s easier to solve for t. Here y = t/2 is simpler.' },
-        { num:'Step 2: Solve for t', text:'y = t/2\nMultiply both sides by 2:\nt = 2y' },
-        { num:'Step 3: Substitute into the other equation', text:'x = t² − 4\nx = (2y)² − 4\nx = 4y² − 4' },
-        { num:'Step 4: Identify the curve', text:'x = 4y² − 4 is a parabola with horizontal axis, vertex at (−4, 0), opening right.' },
-        { num:'Step 5: Check domain restrictions', text:'The original parametric equations may restrict the domain. If −2 ≤ t ≤ 3, then −1 ≤ y ≤ 3/2, so the rectangular equation is valid only for this y-range.' },
+        { num:'Step 1', text:'Look at both equations and pick the simpler one to solve for t. Here y = t/2 is simpler.' },
+        { num:'Step 2', text:'y = t/2\nMultiply both sides by 2:\nt = 2y' },
+        { num:'Step 3', text:'x = t^2 - 4\nx = (2y)^2 - 4\nx = 4y^2 - 4' },
+        { num:'Step 4', text:'x = 4y^2 - 4 is a parabola with horizontal axis, vertex at (-4, 0), opening right.' },
       ]
     },
     'polar-to-rect': {
       title: 'Polar to Rectangular Conversion',
-      problem: 'Convert the point (√3, π/6) from polar to rectangular coordinates.',
+      problem: 'Convert (sqrt3, pi/6) from polar to rectangular.',
       steps: [
-        { num:'Step 1: Identify r and θ', text:'r = √3, θ = π/6' },
-        { num:'Step 2: Apply x = r cos θ', text:'x = √3 · cos(π/6)\nx = √3 · (√3/2)\nx = 3/2' },
-        { num:'Step 3: Apply y = r sin θ', text:'y = √3 · sin(π/6)\ny = √3 · (1/2)\ny = √3/2' },
-        { num:'Step 4: Write the result', text:'The rectangular coordinates are (3/2, √3/2).' },
+        { num:'Step 1', text:'r = sqrt3, theta = pi/6' },
+        { num:'Step 2', text:'x = sqrt3 * cos(pi/6) = sqrt3 * (sqrt3/2) = 3/2' },
+        { num:'Step 3', text:'y = sqrt3 * sin(pi/6) = sqrt3 * (1/2) = sqrt3/2' },
+        { num:'Result', text:'Rectangular: (3/2, sqrt3/2)' },
       ]
     },
     'rect-to-polar': {
       title: 'Rectangular to Polar Conversion',
-      problem: 'Convert the point (−1, 1) from rectangular to polar coordinates.',
+      problem: 'Convert (-1, 1) from rectangular to polar.',
       steps: [
-        { num:'Step 1: Find r', text:'r = √(x² + y²)\nr = √((-1)² + 1²)\nr = √(1 + 1)\nr = √2' },
-        { num:'Step 2: Find the reference angle', text:'tan θ = y/x = 1/(−1) = −1\narctan(−1) = −π/4\nBut (−1, 1) is in Quadrant II!' },
-        { num:'Step 3: Adjust for the correct quadrant', text:'Since the point is in Q2:\nθ = π + arctan(−1) = π − π/4 = 3π/4' },
-        { num:'Step 4: Write the result', text:'The polar coordinates are (√2, 3π/4).\n\nNote: We use positive r since θ is in the same quadrant as the point.' },
+        { num:'Step 1', text:'r = sqrt((-1)^2 + 1^2) = sqrt(2)' },
+        { num:'Step 2', text:'tan theta = 1/(-1) = -1. arctan(-1) = -pi/4. But (-1,1) is in Q2!' },
+        { num:'Step 3', text:'theta = pi - pi/4 = 3pi/4' },
+        { num:'Result', text:'Polar: (sqrt2, 3pi/4)' },
       ]
     },
     'find-param': {
       title: 'Finding Parametric Equations',
-      problem: 'Find parametric equations for y = 1 − x² using: (a) t = x, (b) t = 1 − x',
+      problem: 'Find parametric equations for y = 1 - x^2 using t = x.',
       steps: [
-        { num:'Step 1: Method (a) — Let t = x', text:'If t = x, then:\nx = t\ny = 1 − x² = 1 − t²\n\nParametric equations: x = t, y = 1 − t²' },
-        { num:'Step 2: Method (b) — Let t = 1 − x', text:'If t = 1 − x, then:\nx = 1 − t\ny = 1 − x² = 1 − (1 − t)² = 1 − (1 − 2t + t²) = 2t − t²\n\nParametric equations: x = 1 − t, y = 2t − t²' },
-        { num:'Step 3: Compare orientations', text:'Method (a): As t increases, x increases (left to right)\nMethod (b): As t increases, x = 1 − t decreases (right to left)\n\nSame graph, opposite orientations!' },
-        { num:'Key Takeaway', text:'The parametric representation of a graph is not unique. Different parameterizations can trace the same curve at different speeds and in different directions.' },
+        { num:'Step 1', text:'Let t = x, then x = t.' },
+        { num:'Step 2', text:'y = 1 - x^2 = 1 - t^2' },
+        { num:'Result', text:'x = t, y = 1 - t^2' },
+        { num:'Key Point', text:'Different parameterizations trace the same curve at different speeds and directions.' },
       ]
     },
     'identify-curve': {
       title: 'Identifying Polar Curves',
-      problem: 'Identify and sketch r = 1 − 2cos θ',
+      problem: 'Identify r = 1 - 2cos theta.',
       steps: [
-        { num:'Step 1: Identify the form', text:'r = a + b cos θ where a = 1, b = −2 (or equivalently a = 1, |b| = 2)\nThis is a limaçon form: r = a ± b cos θ' },
-        { num:'Step 2: Determine the type', text:'Compute a/|b| = 1/2\nSince a/|b| < 1, this is a limaçon with an inner loop.' },
-        { num:'Step 3: Find symmetry', text:'Since the equation involves cos θ (not sin θ), it\'s symmetric about the polar axis.\nQuick test: r = g(cos θ) → polar axis symmetry.' },
-        { num:'Step 4: Find key values', text:'Max |r|: r = 1 − 2(−1) = 3 when θ = π\nZeros: r = 0 when cos θ = 1/2 → θ = π/3, 5π/3\nMin r: r = 1 − 2(1) = −1 when θ = 0 (negative r creates inner loop)' },
-        { num:'Step 5: Plot key points', text:'θ = 0: r = −1 (inner loop point)\nθ = π/3: r = 0\nθ = π/2: r = 1\nθ = 2π/3: r = 2\nθ = π: r = 3 (farthest point)\nUse symmetry to complete the bottom half.' },
+        { num:'Step 1', text:'Form: r = a + b cos theta where a=1, |b|=2. This is a limacon.' },
+        { num:'Step 2', text:'a/|b| = 1/2 < 1, so limacon with inner loop.' },
+        { num:'Step 3', text:'Symmetric about polar axis (cos theta = g(cos theta)).' },
+        { num:'Step 4', text:'Max |r| = 3 at theta = pi. r = 0 when cos theta = 1/2 (theta = pi/3).' },
       ]
     },
   };
@@ -1626,31 +2184,182 @@ function showWalkthrough(type) {
   const w = walkthroughs[type];
   let html = '<h3 style="margin-bottom:8px">' + w.title + '</h3>';
   html += '<div class="formula-box">' + w.problem + '</div>';
-  w.steps.forEach((s, i) => {
-    html += '<div class="walkthrough-step" id="ws-' + i + '">';
-    html += '<div class="step-num">' + s.num + '</div>';
-    html += '<p>' + s.text.replace(/\n/g, '<br>') + '</p>';
-    html += '</div>';
+  w.steps.forEach((s,i) => {
+    html += '<div class="walkthrough-step"><div class="step-num">' + s.num + '</div><p>' + s.text.replace(/\n/g,'<br>') + '</p></div>';
   });
   area.innerHTML = html;
+}
+
+function generateRandomProblem() {
+  const types = ['polar-to-rect-rand', 'rect-to-polar-rand', 'identify-curve-rand', 'petals-rand'];
+  const type = types[Math.floor(Math.random() * types.length)];
+  const area = document.getElementById('walkthroughArea');
+  let html = '';
+
+  if (type === 'polar-to-rect-rand') {
+    const commonAngles = [
+      { name:'pi/6', val:Math.PI/6, cosV:'sqrt3/2', sinV:'1/2' },
+      { name:'pi/4', val:Math.PI/4, cosV:'sqrt2/2', sinV:'sqrt2/2' },
+      { name:'pi/3', val:Math.PI/3, cosV:'1/2', sinV:'sqrt3/2' },
+      { name:'pi/2', val:Math.PI/2, cosV:'0', sinV:'1' },
+    ];
+    const r = Math.floor(Math.random() * 5) + 1;
+    const angle = commonAngles[Math.floor(Math.random() * commonAngles.length)];
+    const x = (r * Math.cos(angle.val)).toFixed(3);
+    const y = (r * Math.sin(angle.val)).toFixed(3);
+    html = '<h3>Random Problem: Polar to Rectangular</h3>';
+    html += '<div class="formula-box">Convert (' + r + ', ' + angle.name + ') to rectangular coordinates.</div>';
+    html += '<div class="walkthrough-step"><div class="step-num">Step 1</div><p>x = r cos(theta) = ' + r + ' * cos(' + angle.name + ') = ' + r + ' * ' + angle.cosV + ' = ' + x + '</p></div>';
+    html += '<div class="walkthrough-step"><div class="step-num">Step 2</div><p>y = r sin(theta) = ' + r + ' * sin(' + angle.name + ') = ' + r + ' * ' + angle.sinV + ' = ' + y + '</p></div>';
+    html += '<div class="walkthrough-step"><div class="step-num">Answer</div><p>(' + x + ', ' + y + ')</p></div>';
+  } else if (type === 'rect-to-polar-rand') {
+    const vals = [[1,1],[1,0],[0,1],[3,4],[1,Math.sqrt(3)],[Math.sqrt(3),1]];
+    const [x,y] = vals[Math.floor(Math.random()*vals.length)];
+    const signs = [[1,1],[1,-1],[-1,1],[-1,-1]];
+    const [sx,sy] = signs[Math.floor(Math.random()*signs.length)];
+    const ax = x*sx, ay = y*sy;
+    const r = Math.sqrt(ax*ax+ay*ay);
+    const theta = Math.atan2(ay,ax);
+    html = '<h3>Random Problem: Rectangular to Polar</h3>';
+    html += '<div class="formula-box">Convert (' + ax.toFixed(2) + ', ' + ay.toFixed(2) + ') to polar coordinates.</div>';
+    html += '<div class="walkthrough-step"><div class="step-num">Step 1</div><p>r = sqrt(x^2 + y^2) = sqrt(' + (ax*ax).toFixed(2) + ' + ' + (ay*ay).toFixed(2) + ') = ' + r.toFixed(3) + '</p></div>';
+    html += '<div class="walkthrough-step"><div class="step-num">Step 2</div><p>theta = atan2(y, x) = atan2(' + ay.toFixed(2) + ', ' + ax.toFixed(2) + ') = ' + theta.toFixed(3) + ' rad (' + (theta*180/Math.PI).toFixed(1) + ' deg)</p></div>';
+    html += '<div class="walkthrough-step"><div class="step-num">Answer</div><p>(' + r.toFixed(3) + ', ' + theta.toFixed(3) + ')</p></div>';
+  } else if (type === 'identify-curve-rand') {
+    const a = Math.floor(Math.random()*4)+1;
+    const b = Math.floor(Math.random()*4)+1;
+    const trig = Math.random() < 0.5 ? 'cos' : 'sin';
+    const sign = Math.random() < 0.5 ? '+' : '-';
+    const ratio = a/b;
+    let curveType;
+    if (ratio < 1) curveType = 'Limacon with inner loop (a/b < 1)';
+    else if (Math.abs(ratio - 1) < 0.01) curveType = 'Cardioid (a/b = 1)';
+    else if (ratio < 2) curveType = 'Dimpled limacon (1 < a/b < 2)';
+    else curveType = 'Convex limacon (a/b >= 2)';
+    html = '<h3>Random Problem: Identify Polar Curve</h3>';
+    html += '<div class="formula-box">Identify the type of curve: r = ' + a + ' ' + sign + ' ' + b + trig + '(theta)</div>';
+    html += '<div class="walkthrough-step"><div class="step-num">Step 1</div><p>This is in the form r = a ' + sign + ' b ' + trig + '(theta) with a = ' + a + ', b = ' + b + '.</p></div>';
+    html += '<div class="walkthrough-step"><div class="step-num">Step 2</div><p>a/b = ' + a + '/' + b + ' = ' + ratio.toFixed(2) + '</p></div>';
+    html += '<div class="walkthrough-step"><div class="step-num">Answer</div><p><strong>' + curveType + '</strong></p></div>';
+  } else {
+    const n = Math.floor(Math.random()*6)+2;
+    const trig = Math.random() < 0.5 ? 'cos' : 'sin';
+    const a = Math.floor(Math.random()*4)+2;
+    const petals = n % 2 === 0 ? 2*n : n;
+    html = '<h3>Random Problem: Rose Curve Petals</h3>';
+    html += '<div class="formula-box">How many petals does r = ' + a + trig + '(' + n + 'theta) have?</div>';
+    html += '<div class="walkthrough-step"><div class="step-num">Step 1</div><p>n = ' + n + ' (' + (n%2===0?'even':'odd') + ')</p></div>';
+    html += '<div class="walkthrough-step"><div class="step-num">Step 2</div><p>' + (n%2===0?'n even: 2n = 2('+n+') = '+petals+' petals':'n odd: n = '+n+' petals') + '</p></div>';
+    html += '<div class="walkthrough-step"><div class="step-num">Answer</div><p><strong>' + petals + ' petals</strong>, each of length ' + a + '</p></div>';
+  }
+
+  area.innerHTML = html;
+}
+
+// ==================== PARENT VIEW ====================
+function openParentView() {
+  const existingPin = localStorage.getItem('studyhub_parent_pin');
+  if (!existingPin) {
+    document.getElementById('parentPinTitle').textContent = 'Set Parent PIN';
+    document.getElementById('parentPinDesc').textContent = 'Create a PIN to protect the parent dashboard.';
+  } else {
+    document.getElementById('parentPinTitle').textContent = 'Parent PIN';
+    document.getElementById('parentPinDesc').textContent = 'Enter your PIN to view stats.';
+  }
+  document.getElementById('parentPinInput').value = '';
+  document.getElementById('parentPinError').style.display = 'none';
+  document.getElementById('parentOverlay').classList.remove('hidden');
+}
+
+function handleParentPin() {
+  const pin = document.getElementById('parentPinInput').value;
+  const errEl = document.getElementById('parentPinError');
+  if (!pin || pin.length < 3) { errEl.textContent = 'PIN must be at least 3 characters'; errEl.style.display = 'block'; return; }
+  const existingPin = localStorage.getItem('studyhub_parent_pin');
+  if (!existingPin) {
+    localStorage.setItem('studyhub_parent_pin', hashPin(pin));
+    document.getElementById('parentOverlay').classList.add('hidden');
+    showSection('parent');
+    renderParentView();
+  } else {
+    if (hashPin(pin) !== existingPin) { errEl.textContent = 'Wrong PIN'; errEl.style.display = 'block'; return; }
+    document.getElementById('parentOverlay').classList.add('hidden');
+    showSection('parent');
+    renderParentView();
+  }
+}
+
+function renderParentView() {
+  const users = getUsers();
+  const container = document.getElementById('parentContent');
+  if (Object.keys(users).length === 0) { container.innerHTML = '<p>No student accounts yet.</p>'; return; }
+
+  let html = '';
+  Object.keys(users).forEach(username => {
+    const data = localStorage.getItem('studyhub_progress_' + username);
+    const p = data ? JSON.parse(data) : {};
+    const xp = p.xp || 0;
+    const streak = p.streak || 0;
+    const longest = p.longestStreak || 0;
+    const total = p.totalAnswered || 0;
+    const missed = (p.missedQuestions || []).length;
+    const lvl = getLevel(xp);
+    const scores = p.quizScores || { parametric:[], polar:[], graphs:[] };
+
+    html += '<div class="user-stat-card">';
+    html += '<h3>' + username + ' <span style="font-size:0.8rem;font-weight:400;color:var(--text-light)">Lv ' + lvl + ' ' + getLevelName(xp) + '</span></h3>';
+    html += '<div class="user-stat-grid">';
+    html += '<div class="user-stat-item"><div class="val">' + xp + '</div><div class="lbl">Total XP</div></div>';
+    html += '<div class="user-stat-item"><div class="val">' + streak + '</div><div class="lbl">Current Streak</div></div>';
+    html += '<div class="user-stat-item"><div class="val">' + longest + '</div><div class="lbl">Best Streak</div></div>';
+    html += '<div class="user-stat-item"><div class="val">' + total + '</div><div class="lbl">Questions Answered</div></div>';
+    html += '<div class="user-stat-item"><div class="val">' + missed + '</div><div class="lbl">Missed</div></div>';
+    html += '<div class="user-stat-item"><div class="val">' + (p.lastStudyDate || '--') + '</div><div class="lbl">Last Studied</div></div>';
+    html += '</div>';
+
+    // Accuracy bars
+    html += '<div style="margin-top:16px"><strong style="font-size:0.85rem">Accuracy by Topic</strong></div>';
+    ['parametric', 'polar', 'graphs'].forEach(t => {
+      const s = scores[t] || [];
+      const avg = s.length > 0 ? Math.round(s.reduce((a,b)=>a+b,0)/s.length*100) : 0;
+      const color = avg >= 70 ? 'var(--success)' : avg >= 40 ? 'var(--warning)' : s.length > 0 ? 'var(--danger)' : '#ddd';
+      const label = {parametric:'10.6 Parametric', polar:'10.7 Polar', graphs:'10.8 Graphs'}[t];
+      html += '<div class="topic-accuracy-bar"><span style="width:110px">' + label + '</span><div class="bar-track"><div class="bar-fill" style="width:' + avg + '%;background:' + color + '"></div></div><span style="width:40px;text-align:right">' + (s.length>0?avg+'%':'--') + '</span></div>';
+    });
+
+    // Study calendar (last 28 days)
+    html += '<div style="margin-top:16px"><strong style="font-size:0.85rem">Study Activity (last 28 days)</strong></div>';
+    html += '<div class="study-calendar">';
+    const log = p.dailyLog || {};
+    const today = new Date();
+    for (let i = 27; i >= 0; i--) {
+      const d = new Date(today); d.setDate(d.getDate() - i);
+      const ds = d.toISOString().slice(0,10);
+      const isActive = log[ds] && log[ds] > 0;
+      const isToday = i === 0;
+      html += '<div class="cal-day' + (isActive?' active':'') + (isToday?' today':'') + '" title="' + ds + (isActive?' ('+log[ds]+' actions)':'') + '"></div>';
+    }
+    html += '</div>';
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
 }
 
 // ==================== INIT ====================
 window.addEventListener('DOMContentLoaded', () => {
   renderFlashcard();
-  updateGlobalProgress();
-  updateMissedButton();
+  updateAllDisplays();
   checkAuth();
+  setupConverterClick();
 
-  // Default walkthrough
-  document.getElementById('walkthroughArea').innerHTML = '<p style="color:var(--text-light)">Select a topic above to see a step-by-step walkthrough.</p>';
+  document.getElementById('walkthroughArea').innerHTML = '<p style="color:var(--text-light)">Select a topic above or generate a random problem.</p>';
 
-  // Handle Enter key for auth
   ['authUsername','authPassword'].forEach(id => {
     document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') handleAuth(); });
   });
+  document.getElementById('parentPinInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleParentPin(); });
 
-  // Handle Enter key for graphing
   ['paramX','paramY','paramTMin','paramTMax'].forEach(id => {
     document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') drawParametric(); });
   });
