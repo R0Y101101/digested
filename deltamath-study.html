@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeltaMath Study Hub</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<style>
+  :root {
+    --primary: #1a73e8;
+    --primary-light: #4a9af5;
+    --secondary: #00bfa5;
+    --accent: #ff6d00;
+    --success: #00c853;
+    --danger: #ff1744;
+    --dark: #1e1e2f;
+    --light: #f5f6fa;
+    --card-bg: #ffffff;
+    --text: #2d3436;
+    --text-light: #636e72;
+    --shadow: 0 4px 20px rgba(26,115,232,0.1);
+    --radius: 14px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--light); color:var(--text); line-height:1.6; }
+
+  .header {
+    background: linear-gradient(135deg, var(--dark), #2d2d44);
+    color:white; padding:20px 24px;
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:100;
+  }
+  .header h1 { font-size:1.4rem; }
+  .header .sub { font-size:0.8rem; opacity:0.7; }
+  .header a { color: var(--primary-light); text-decoration:none; font-size:0.85rem; }
+
+  .main { max-width:900px; margin:0 auto; padding:20px 16px; }
+
+  .tabs { display:flex; gap:4px; background:white; padding:4px; border-radius:12px; margin-bottom:20px; box-shadow:var(--shadow); }
+  .tab { flex:1; padding:10px; text-align:center; border:none; background:none; font-size:0.85rem; font-weight:600; cursor:pointer; border-radius:10px; color:var(--text-light); transition:all 0.2s; }
+  .tab.active { background:var(--primary); color:white; }
+  .tab:hover:not(.active) { background:#f0f0f0; }
+
+  .section { display:none; }
+  .section.active { display:block; }
+
+  .card { background:var(--card-bg); border-radius:var(--radius); padding:20px; margin-bottom:16px; box-shadow:var(--shadow); }
+  .card h2 { font-size:1.2rem; margin-bottom:12px; color:var(--primary); }
+  .card h3 { font-size:1rem; margin-bottom:8px; }
+
+  /* Problem Cards */
+  .problem-card {
+    background:white; border-radius:var(--radius); padding:20px; margin-bottom:14px;
+    box-shadow:var(--shadow); border-left:4px solid var(--primary);
+  }
+  .problem-card.vector { border-left-color: var(--accent); }
+  .problem-card.identity { border-left-color: var(--secondary); }
+  .problem-topic { font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--primary); margin-bottom:6px; }
+  .problem-topic.vector { color:var(--accent); }
+  .problem-topic.identity { color:var(--secondary); }
+  .problem-question { font-size:1rem; margin-bottom:12px; line-height:1.7; }
+  .problem-type { display:inline-block; padding:2px 10px; border-radius:10px; font-size:0.7rem; font-weight:700; margin-bottom:8px; }
+  .type-mc { background:#e8f0fe; color:var(--primary); }
+  .type-input { background:#e0f7fa; color:#00838f; }
+
+  /* Choices */
+  .choices { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px; }
+  .choice {
+    padding:10px 14px; background:var(--light); border:2px solid #e0e0e0;
+    border-radius:10px; cursor:pointer; font-size:0.9rem; transition:all 0.2s;
+  }
+  .choice:hover { border-color:var(--primary); background:#f0f5ff; }
+  .choice.selected { border-color:var(--primary); background:#e8f0fe; }
+  .choice.correct { border-color:var(--success); background:#e8f5e9; }
+  .choice.wrong { border-color:var(--danger); background:#ffebee; }
+
+  /* Math rendering */
+  .math-block { margin:8px 0; font-size:1.2rem; text-align:center; }
+  .math-inline { font-size:1rem; }
+
+  /* Quiz mode */
+  .quiz-input { width:100%; padding:10px; border:2px solid #ddd; border-radius:8px; font-size:1rem; margin-top:8px; }
+  .quiz-input:focus { border-color:var(--primary); outline:none; }
+
+  .btn { padding:8px 20px; border:none; border-radius:10px; font-size:0.85rem; font-weight:600; cursor:pointer; transition:all 0.2s; }
+  .btn-primary { background:var(--primary); color:white; }
+  .btn-primary:hover { background:#1557b0; }
+  .btn-success { background:var(--success); color:white; }
+  .btn-outline { background:none; border:2px solid var(--primary); color:var(--primary); }
+  .btn-outline:hover { background:var(--primary); color:white; }
+  .btn-small { padding:6px 14px; font-size:0.8rem; }
+  .btn-danger { background:var(--danger); color:white; }
+
+  .reveal-btn { margin-top:10px; }
+  .hint-box { margin-top:10px; padding:12px; background:#fff8e1; border:1px solid #ffcc02; border-radius:10px; font-size:0.85rem; display:none; }
+  .hint-box.show { display:block; }
+
+  /* Stats */
+  .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:16px; }
+  .stat-card { background:white; border-radius:12px; padding:16px; text-align:center; box-shadow:var(--shadow); }
+  .stat-num { font-size:1.8rem; font-weight:800; color:var(--primary); }
+  .stat-label { font-size:0.75rem; color:var(--text-light); }
+
+  /* Topic filter */
+  .topic-filter { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+  .topic-chip {
+    padding:6px 12px; border-radius:20px; font-size:0.75rem; font-weight:600;
+    background:white; border:1px solid #ddd; cursor:pointer; transition:all 0.2s;
+  }
+  .topic-chip.active { background:var(--primary); color:white; border-color:var(--primary); }
+  .topic-chip:hover { border-color:var(--primary); }
+
+  .score-bar { background:#eee; border-radius:6px; height:8px; margin-top:6px; overflow:hidden; }
+  .score-fill { height:100%; background:var(--success); border-radius:6px; transition:width 0.3s; }
+
+  @media(max-width:600px) {
+    .choices { grid-template-columns:1fr; }
+    .stats-grid { grid-template-columns:1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>DeltaMath Study Hub</h1>
+    <div class="sub">Benchmark 2 — Trig, Identities & Vectors</div>
+  </div>
+  <a href="index.html">← Back to Home</a>
+</div>
+
+<div class="main">
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('review')">Review All</button>
+    <button class="tab" onclick="showTab('flashcards')">Flashcards</button>
+    <button class="tab" onclick="showTab('quiz')">Quiz Me</button>
+    <button class="tab" onclick="showTab('progress')">Progress</button>
+  </div>
+
+  <!-- REVIEW ALL -->
+  <div class="section active" id="sec-review">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-num" id="totalProblems">0</div><div class="stat-label">Problems</div></div>
+      <div class="stat-card"><div class="stat-num" id="totalTopics">0</div><div class="stat-label">Topics</div></div>
+      <div class="stat-card"><div class="stat-num" id="mcCount">0</div><div class="stat-label">Multiple Choice</div></div>
+      <div class="stat-card"><div class="stat-num" id="inputCount">0</div><div class="stat-label">Free Response</div></div>
+    </div>
+    <div class="topic-filter" id="topicFilter"></div>
+    <div id="problemList"></div>
+  </div>
+
+  <!-- FLASHCARDS -->
+  <div class="section" id="sec-flashcards">
+    <div class="card" style="text-align:center">
+      <div style="font-size:0.85rem;color:var(--text-light);margin-bottom:8px" id="fcNav">Card 1 of 18</div>
+      <div id="fcTopic" class="problem-topic" style="margin-bottom:12px"></div>
+      <div id="fcQuestion" class="problem-question" style="min-height:100px;font-size:1.1rem"></div>
+      <div id="fcChoices" style="margin:16px 0"></div>
+      <div id="fcHint" class="hint-box"></div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:16px">
+        <button class="btn btn-outline" onclick="fcPrev()">Previous</button>
+        <button class="btn btn-primary" onclick="fcShowHint()" id="fcHintBtn">Show Hint</button>
+        <button class="btn btn-outline" onclick="fcNext()">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="section" id="sec-quiz">
+    <div class="card">
+      <h2>Quiz Mode</h2>
+      <p style="margin-bottom:12px;color:var(--text-light);font-size:0.9rem">Test yourself on the DeltaMath problems. Get them right to build mastery.</p>
+      <div class="topic-filter" id="quizTopicFilter"></div>
+      <div id="quizArea"></div>
+      <div style="display:flex;gap:8px;margin-top:12px" id="quizControls">
+        <button class="btn btn-primary" onclick="checkQuizAnswer()" id="quizCheckBtn">Check Answer</button>
+        <button class="btn btn-outline" onclick="nextQuizQuestion()">Skip</button>
+      </div>
+      <div id="quizFeedback" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="section" id="sec-progress">
+    <div class="card">
+      <h2>Your Progress</h2>
+      <div id="progressList"></div>
+      <button class="btn btn-outline btn-small" onclick="resetProgress()" style="margin-top:16px">Reset Progress</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====== PROBLEM DATA (from deltamath-problems.json) ======
+const rawProblems = [
+  {
+    topic: "Exact Value of All Angles (Degree)",
+    question: "Find the exact value of tan 210°",
+    mathQuestion: "\\tan 210^{\\circ}",
+    type: "mc",
+    choices: ["\\frac{\\sqrt{3}}{3}", "-\\sqrt{3}", "-\\frac{\\sqrt{3}}{3}", "\\sqrt{3}"],
+    correct: 0,
+    hint: "210° is in Q3 (180°+30°). In Q3, tan is positive. tan 30° = √3/3, so tan 210° = √3/3.",
+    category: "trig"
+  },
+  {
+    topic: "Write Trig Function Given Features (Sin/Cos) L1",
+    question: "Write a cosine function that has a midline of y = 5, an amplitude of 2, and a period of π/2.",
+    mathQuestion: "\\text{midline } y=5,\\; \\text{amplitude } 2,\\; \\text{period } \\frac{\\pi}{2}",
+    type: "input",
+    answer: "f(x) = 2cos(4x) + 5",
+    hint: "Formula: f(x) = A·cos(Bx) + D where A = amplitude, D = midline, B = 2π/period. Period = π/2, so B = 2π/(π/2) = 4.",
+    category: "trig"
+  },
+  {
+    topic: "Write Trig Function Given Features (Sin/Cos) L2",
+    question: "Write a sine function with midline y = 3, amplitude 4, period π, and horizontal shift π/3 to the left.",
+    mathQuestion: "\\text{midline } y=3,\\; A=4,\\; T=\\pi,\\; \\text{shift } \\frac{\\pi}{3} \\text{ left}",
+    type: "input",
+    answer: "f(x) = 4sin(2(x + π/3)) + 3",
+    hint: "f(x) = A·sin(B(x - C)) + D. B = 2π/π = 2. Shift left means C = -π/3, so (x + π/3). Answer: 4sin(2(x + π/3)) + 3",
+    category: "trig"
+  },
+  {
+    topic: "Determine Min and Max from Trig Equation",
+    question: "Determine the minimum and maximum value of f(x) = 4sin(x) + 3.",
+    mathQuestion: "f(x) = 4\\sin x + 3",
+    type: "input",
+    answer: "Min: -1, Max: 7",
+    hint: "For f(x) = A·sin(x) + D: Max = D + |A| = 3 + 4 = 7. Min = D - |A| = 3 - 4 = -1.",
+    category: "trig"
+  },
+  {
+    topic: "Trig Graphs Match Multiple Choice L1",
+    question: "Which equation corresponds to the graph? (Graph shows amplitude 500, period 40, reflected)",
+    mathQuestion: "\\text{Amplitude}=500,\\; \\text{Period}=40,\\; \\text{Reflected}",
+    type: "mc",
+    choices: ["y=-500\\cos\\left(\\frac{\\pi}{40}x\\right)", "y=500\\cos\\left(\\frac{\\pi}{20}x\\right)", "y=-500\\cos\\left(\\frac{\\pi}{20}x\\right)", "y=500\\cos\\left(\\frac{\\pi}{40}x\\right)"],
+    correct: 2,
+    hint: "Period = 2π/B. If period = 40, then B = 2π/40 = π/20. Reflected means negative. Answer: y = -500cos(πx/20).",
+    category: "trig"
+  },
+  {
+    topic: "Trig Graphs Match Multiple Choice L2",
+    question: "Which equation represents the graph? (Graph shows amplitude 4, with horizontal shift)",
+    mathQuestion: "\\text{Match the trig graph to its equation}",
+    type: "mc",
+    choices: ["y=4\\cos\\left(\\frac{\\pi}{16}(x-6)\\right)", "y=4\\cos\\left(\\frac{\\pi}{16}(x+6)\\right)", "y=4\\cos\\left(\\frac{\\pi}{8}(x+6)\\right)", "y=4\\cos\\left(\\frac{\\pi}{8}(x-6)\\right)"],
+    correct: 0,
+    hint: "Identify period from graph to find B = 2π/period. Then check the phase shift: shifted right means (x - C).",
+    category: "trig"
+  },
+  {
+    topic: "Determine Period from Trig Graph (Tangent)",
+    question: "Determine the period of the tangent graph (from the given graph with asymptotes).",
+    mathQuestion: "\\text{Find the period of } y = \\tan(Bx)",
+    type: "input",
+    answer: "π/3",
+    hint: "For tangent, the period = distance between consecutive asymptotes. Look at the x-axis markings on the graph. Period of tan(Bx) = π/B.",
+    category: "trig"
+  },
+  {
+    topic: "Determine Period from Trig Equation (Tangent)",
+    question: "Determine the period of y = tan(4x − π/4) − 9.",
+    mathQuestion: "y = \\tan\\left(4x - \\frac{\\pi}{4}\\right) - 9",
+    type: "input",
+    answer: "π/4",
+    hint: "For y = tan(Bx + C) + D, the period = π/|B|. Here B = 4, so period = π/4. The vertical shift and phase shift don't affect the period.",
+    category: "trig"
+  },
+  {
+    topic: "General Solutions of Trig Equations L1",
+    question: "Find the general solution: 2cos(x) − √3 = 0",
+    mathQuestion: "2\\cos x - \\sqrt{3} = 0",
+    type: "input",
+    answer: "x = π/6 + 2πk, x = 11π/6 + 2πk",
+    hint: "cos(x) = √3/2. This happens at x = π/6 and x = 11π/6 (or -π/6). General solution adds 2πk for all integers k.",
+    category: "trig"
+  },
+  {
+    topic: "General Solutions of Trig Equations L2",
+    question: "Find the general solution: 2cos(3x) = √3",
+    mathQuestion: "2\\cos(3x) = \\sqrt{3}",
+    type: "input",
+    answer: "x = π/18 + 2πk/3, x = 11π/18 + 2πk/3",
+    hint: "cos(3x) = √3/2 → 3x = π/6 + 2πk or 3x = 11π/6 + 2πk. Divide all by 3: x = π/18 + 2πk/3 or x = 11π/18 + 2πk/3.",
+    category: "trig"
+  },
+  {
+    topic: "Quadratic Trig Equations in Radians",
+    question: "Solve for 0 ≤ θ < 2π: 3sec²θ + 9secθ + 6 = 0",
+    mathQuestion: "3\\sec^2\\theta + 9\\sec\\theta + 6 = 0",
+    type: "input",
+    answer: "θ = 2π/3, π, 4π/3",
+    hint: "Let u = secθ. Then 3u² + 9u + 6 = 0 → u² + 3u + 2 = 0 → (u+1)(u+2) = 0. So secθ = -1 or secθ = -2. secθ = -1 → cosθ = -1 → θ = π. secθ = -2 → cosθ = -1/2 → θ = 2π/3, 4π/3.",
+    category: "identity"
+  },
+  {
+    topic: "Quadratic Trig Equations with Identities",
+    question: "Solve for 0 ≤ θ < 2π: 2sec²θ + 10tanθ − 2 = 10tanθ + 6",
+    mathQuestion: "2\\sec^2\\theta + 10\\tan\\theta - 2 = 10\\tan\\theta + 6",
+    type: "input",
+    answer: "θ = 2π/3, 4π/3",
+    hint: "Simplify: 2sec²θ - 2 = 6 → 2sec²θ = 8 → sec²θ = 4 → cos²θ = 1/4 → cosθ = ±1/2. The tanθ terms cancel! cosθ = 1/2 → θ = π/3, 5π/3. cosθ = -1/2 → θ = 2π/3, 4π/3. Check which satisfy original.",
+    category: "identity"
+  },
+  {
+    topic: "Simplifying Trig Expressions (Pythagorean)",
+    question: "Simplify to a single trig function with no denominator:",
+    mathQuestion: "\\frac{1 - \\cos^2 x}{\\sin^2 x}",
+    type: "input",
+    answer: "1",
+    hint: "By the Pythagorean identity: 1 - cos²x = sin²x. So sin²x / sin²x = 1.",
+    category: "identity"
+  },
+  {
+    topic: "Simplifying Trig Expressions (Pythagorean) MC",
+    question: "The expression is equivalent to:",
+    mathQuestion: "\\frac{-\\tan^2 x}{\\sec^2 x - 1}",
+    type: "mc",
+    choices: ["-1", "1", "\\sin^2 x", "-\\sin^2 x", "\\tan^2 x", "-\\tan^2 x"],
+    correct: 0,
+    hint: "sec²x - 1 = tan²x (Pythagorean identity). So -tan²x / tan²x = -1.",
+    category: "identity"
+  },
+  {
+    topic: "Magnitude and Direction of Scalar Multiple",
+    question: "Vector u has magnitude 2 and direction 160°. If v = −5u, find the magnitude and direction of v.",
+    mathQuestion: "\\mathbf{u}: |\\mathbf{u}|=2,\\; \\theta=160^\\circ.\\;\\; \\mathbf{v}=-5\\mathbf{u}",
+    type: "input",
+    answer: "Magnitude: 10, Direction: 340°",
+    hint: "Magnitude of v = |−5| × |u| = 5 × 2 = 10. Direction: multiplying by negative reverses direction, so add 180°: 160° + 180° = 340°.",
+    category: "vector"
+  },
+  {
+    topic: "Add Vectors in Magnitude & Direction Form",
+    question: "Find u + v where u = 3⟨cos205°, sin205°⟩ and v = 6⟨cos265°, sin265°⟩",
+    mathQuestion: "\\mathbf{u}=3\\langle\\cos205°,\\sin205°\\rangle,\\;\\mathbf{v}=6\\langle\\cos265°,\\sin265°\\rangle",
+    type: "input",
+    answer: "≈ 8.0⟨cos248°, sin248°⟩",
+    hint: "Convert to components: ux = 3cos205°, uy = 3sin205°, vx = 6cos265°, vy = 6sin265°. Add components, then find magnitude = √(sx²+sy²) and direction = atan2(sy, sx).",
+    category: "vector"
+  },
+  {
+    topic: "Rewrite Vector with Standard Unit Vectors",
+    question: "Express ⟨3, −2⟩ in terms of standard unit vectors i and j.",
+    mathQuestion: "\\langle 3, -2 \\rangle \\text{ in terms of } \\mathbf{i} \\text{ and } \\mathbf{j}",
+    type: "input",
+    answer: "3i − 2j",
+    hint: "⟨a, b⟩ = ai + bj. So ⟨3, −2⟩ = 3i + (−2)j = 3i − 2j.",
+    category: "vector"
+  }
+];
+
+// ====== STATE ======
+let activeFilter = 'all';
+let fcIndex = 0;
+let filteredProblems = [...rawProblems];
+let quizCurrent = null;
+let quizFilter = 'all';
+let dmProgress = JSON.parse(localStorage.getItem('dmProgress') || '{}');
+if (!dmProgress.correct) dmProgress.correct = {};
+if (!dmProgress.attempts) dmProgress.attempts = {};
+
+function saveDmProgress() { localStorage.setItem('dmProgress', JSON.stringify(dmProgress)); }
+
+// ====== RENDER MATH ======
+function renderMath(tex) {
+  try {
+    return katex.renderToString(tex, { throwOnError: false, displayMode: false });
+  } catch(e) { return tex; }
+}
+function renderMathBlock(tex) {
+  try {
+    return katex.renderToString(tex, { throwOnError: false, displayMode: true });
+  } catch(e) { return tex; }
+}
+
+// ====== TABS ======
+function showTab(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  event.target.classList.add('active');
+  if (id === 'quiz') loadQuizQuestion();
+  if (id === 'progress') renderProgress();
+}
+
+// ====== REVIEW ======
+function renderReview() {
+  const topics = [...new Set(rawProblems.map(p => p.topic))];
+  const mcProblems = rawProblems.filter(p => p.type === 'mc');
+  document.getElementById('totalProblems').textContent = rawProblems.length;
+  document.getElementById('totalTopics').textContent = topics.length;
+  document.getElementById('mcCount').textContent = mcProblems.length;
+  document.getElementById('inputCount').textContent = rawProblems.length - mcProblems.length;
+
+  // Topic filter
+  let filterHTML = '<div class="topic-chip active" onclick="filterProblems(\'all\',this)">All</div>';
+  const cats = { trig:'Trig Functions', identity:'Identities', vector:'Vectors' };
+  Object.entries(cats).forEach(([k,v]) => {
+    const count = rawProblems.filter(p => p.category === k).length;
+    filterHTML += `<div class="topic-chip" onclick="filterProblems('${k}',this)">${v} (${count})</div>`;
+  });
+  document.getElementById('topicFilter').innerHTML = filterHTML;
+  document.getElementById('quizTopicFilter').innerHTML = filterHTML.replace(/filterProblems/g, 'filterQuiz');
+
+  renderProblemList('all');
+}
+
+function filterProblems(cat, el) {
+  activeFilter = cat;
+  document.querySelectorAll('#topicFilter .topic-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderProblemList(cat);
+}
+
+function filterQuiz(cat, el) {
+  quizFilter = cat;
+  document.querySelectorAll('#quizTopicFilter .topic-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  loadQuizQuestion();
+}
+
+function renderProblemList(cat) {
+  const problems = cat === 'all' ? rawProblems : rawProblems.filter(p => p.category === cat);
+  let html = '';
+  problems.forEach((p, i) => {
+    const catClass = p.category === 'vector' ? 'vector' : p.category === 'identity' ? 'identity' : '';
+    const typeClass = p.type === 'mc' ? 'type-mc' : 'type-input';
+    const typeLabel = p.type === 'mc' ? 'Multiple Choice' : 'Free Response';
+
+    html += `<div class="problem-card ${catClass}">`;
+    html += `<div class="problem-topic ${catClass}">${p.topic}</div>`;
+    html += `<span class="problem-type ${typeClass}">${typeLabel}</span>`;
+    html += `<div class="problem-question">${p.question}</div>`;
+    html += `<div class="math-block">${renderMathBlock(p.mathQuestion)}</div>`;
+
+    if (p.type === 'mc' && p.choices) {
+      html += '<div class="choices">';
+      p.choices.forEach((c, j) => {
+        html += `<div class="choice" style="cursor:default">${renderMath(c)}</div>`;
+      });
+      html += '</div>';
+    }
+
+    const idx = rawProblems.indexOf(p);
+    html += `<div class="hint-box" id="hint-${idx}">${p.hint}</div>`;
+    html += `<button class="btn btn-small btn-outline reveal-btn" onclick="toggleHint(${idx})">Show Hint / Answer</button>`;
+    html += '</div>';
+  });
+  document.getElementById('problemList').innerHTML = html;
+}
+
+function toggleHint(idx) {
+  const el = document.getElementById('hint-' + idx);
+  el.classList.toggle('show');
+}
+
+// ====== FLASHCARDS ======
+function updateFlashcard() {
+  const problems = activeFilter === 'all' ? rawProblems : rawProblems.filter(p => p.category === activeFilter);
+  if (problems.length === 0) return;
+  if (fcIndex >= problems.length) fcIndex = 0;
+  if (fcIndex < 0) fcIndex = problems.length - 1;
+
+  const p = problems[fcIndex];
+  document.getElementById('fcNav').textContent = `Card ${fcIndex + 1} of ${problems.length}`;
+  document.getElementById('fcTopic').textContent = p.topic;
+  document.getElementById('fcTopic').className = 'problem-topic ' + (p.category === 'vector' ? 'vector' : p.category === 'identity' ? 'identity' : '');
+
+  let qHTML = `<div style="margin-bottom:8px">${p.question}</div>`;
+  qHTML += `<div class="math-block">${renderMathBlock(p.mathQuestion)}</div>`;
+  document.getElementById('fcQuestion').innerHTML = qHTML;
+
+  let cHTML = '';
+  if (p.type === 'mc' && p.choices) {
+    cHTML = '<div class="choices">';
+    p.choices.forEach(c => { cHTML += `<div class="choice" style="cursor:default">${renderMath(c)}</div>`; });
+    cHTML += '</div>';
+  }
+  document.getElementById('fcChoices').innerHTML = cHTML;
+
+  document.getElementById('fcHint').innerHTML = p.hint;
+  document.getElementById('fcHint').classList.remove('show');
+}
+
+function fcNext() { fcIndex++; updateFlashcard(); }
+function fcPrev() { fcIndex--; updateFlashcard(); }
+function fcShowHint() { document.getElementById('fcHint').classList.toggle('show'); }
+
+// ====== QUIZ ======
+function loadQuizQuestion() {
+  const pool = quizFilter === 'all' ? [...rawProblems] : rawProblems.filter(p => p.category === quizFilter);
+  quizCurrent = pool[Math.floor(Math.random() * pool.length)];
+  const p = quizCurrent;
+
+  let html = `<div class="problem-topic">${p.topic}</div>`;
+  html += `<div class="problem-question">${p.question}</div>`;
+  html += `<div class="math-block">${renderMathBlock(p.mathQuestion)}</div>`;
+
+  if (p.type === 'mc' && p.choices) {
+    html += '<div class="choices" id="quizChoices">';
+    p.choices.forEach((c, j) => {
+      html += `<div class="choice" data-idx="${j}" onclick="selectQuizChoice(${j})">${renderMath(c)}</div>`;
+    });
+    html += '</div>';
+  } else {
+    html += `<input type="text" class="quiz-input" id="quizInput" placeholder="Type your answer..." onkeydown="if(event.key==='Enter')checkQuizAnswer()">`;
+  }
+
+  document.getElementById('quizArea').innerHTML = html;
+  document.getElementById('quizFeedback').innerHTML = '';
+  document.getElementById('quizCheckBtn').style.display = 'inline-block';
+}
+
+function selectQuizChoice(idx) {
+  document.querySelectorAll('#quizChoices .choice').forEach(c => c.classList.remove('selected'));
+  document.querySelector(`#quizChoices .choice[data-idx="${idx}"]`).classList.add('selected');
+  quizCurrent._selected = idx;
+}
+
+function checkQuizAnswer() {
+  const p = quizCurrent;
+  const idx = rawProblems.indexOf(p);
+  if (!dmProgress.attempts[idx]) dmProgress.attempts[idx] = 0;
+  dmProgress.attempts[idx]++;
+
+  let isCorrect = false;
+  if (p.type === 'mc') {
+    const selected = p._selected;
+    if (selected === undefined) return;
+    isCorrect = selected === p.correct;
+    document.querySelectorAll('#quizChoices .choice').forEach((c, j) => {
+      if (j === p.correct) c.classList.add('correct');
+      if (j === selected && !isCorrect) c.classList.add('wrong');
+    });
+  } else {
+    // For free response, show the answer
+    isCorrect = false; // Let them self-grade
+  }
+
+  let fbHTML = '';
+  if (p.type === 'mc') {
+    if (isCorrect) {
+      dmProgress.correct[idx] = (dmProgress.correct[idx] || 0) + 1;
+      fbHTML = `<div style="padding:12px;background:#e8f5e9;border:1px solid var(--success);border-radius:10px;color:#2e7d32">Correct! ${p.hint}</div>`;
+    } else {
+      fbHTML = `<div style="padding:12px;background:#ffebee;border:1px solid var(--danger);border-radius:10px;color:#c62828">Not quite. ${p.hint}</div>`;
+    }
+  } else {
+    fbHTML = `<div style="padding:12px;background:#fff8e1;border:1px solid #ff8f00;border-radius:10px">
+      <strong>Answer:</strong> ${p.answer}<br><br>${p.hint}<br><br>
+      <button class="btn btn-small btn-success" onclick="markCorrect(${idx})">I got it right</button>
+      <button class="btn btn-small btn-danger" onclick="markWrong(${idx})">I got it wrong</button>
+    </div>`;
+  }
+
+  document.getElementById('quizFeedback').innerHTML = fbHTML;
+  document.getElementById('quizCheckBtn').style.display = 'none';
+  saveDmProgress();
+}
+
+function markCorrect(idx) {
+  dmProgress.correct[idx] = (dmProgress.correct[idx] || 0) + 1;
+  saveDmProgress();
+  document.getElementById('quizFeedback').innerHTML = '<div style="padding:12px;background:#e8f5e9;border-radius:10px;color:#2e7d32">Marked as correct! Click Skip for next question.</div>';
+}
+
+function markWrong(idx) {
+  saveDmProgress();
+  document.getElementById('quizFeedback').innerHTML = '<div style="padding:12px;background:#ffebee;border-radius:10px;color:#c62828">Keep studying this one. Click Skip for next question.</div>';
+}
+
+function nextQuizQuestion() { loadQuizQuestion(); }
+
+// ====== PROGRESS ======
+function renderProgress() {
+  let html = '';
+  const categories = { trig: 'Trig Functions', identity: 'Identities', vector: 'Vectors' };
+
+  Object.entries(categories).forEach(([cat, label]) => {
+    const problems = rawProblems.filter(p => p.category === cat);
+    html += `<h3 style="margin:16px 0 8px">${label}</h3>`;
+
+    problems.forEach((p, i) => {
+      const idx = rawProblems.indexOf(p);
+      const attempts = dmProgress.attempts[idx] || 0;
+      const correct = dmProgress.correct[idx] || 0;
+      const pct = attempts > 0 ? Math.round((correct / attempts) * 100) : 0;
+
+      html += `<div style="padding:10px 0;border-bottom:1px solid #eee">`;
+      html += `<div style="display:flex;justify-content:space-between;align-items:center">`;
+      html += `<span style="font-size:0.85rem;font-weight:600">${p.topic}</span>`;
+      html += `<span style="font-size:0.75rem;color:var(--text-light)">${correct}/${attempts} correct</span>`;
+      html += `</div>`;
+      html += `<div class="score-bar"><div class="score-fill" style="width:${pct}%"></div></div>`;
+      html += `</div>`;
+    });
+  });
+
+  document.getElementById('progressList').innerHTML = html;
+}
+
+function resetProgress() {
+  if (confirm('Reset all progress?')) {
+    dmProgress = { correct: {}, attempts: {} };
+    saveDmProgress();
+    renderProgress();
+  }
+}
+
+// ====== INIT ======
+window.addEventListener('DOMContentLoaded', () => {
+  renderReview();
+  updateFlashcard();
+});
+</script>
+</body>
+</html>
