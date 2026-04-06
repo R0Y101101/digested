@@ -1270,14 +1270,14 @@ function hashPin(pin) {
 }
 
 function checkAuth() {
-  const saved = localStorage.getItem('studyhub_current');
-  if (saved) {
-    currentUser = saved;
-    document.getElementById('authOverlay').classList.add('hidden');
-    document.getElementById('userBadge').style.display = 'flex';
-    document.getElementById('displayUsername').textContent = currentUser;
-    loadProgress();
-  }
+  // Auto-login: skip the sign-in modal entirely
+  const saved = localStorage.getItem('studyhub_current') || 'student';
+  currentUser = saved;
+  localStorage.setItem('studyhub_current', currentUser);
+  document.getElementById('authOverlay').classList.add('hidden');
+  document.getElementById('userBadge').style.display = 'flex';
+  document.getElementById('displayUsername').textContent = currentUser;
+  loadProgress();
 }
 
 function handleAuth() {
